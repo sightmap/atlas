@@ -1,0 +1,63 @@
+name: Removal request
+description: Site owners — request removal or correction of a map of your site. No questions asked, per docs/POLICY.md.
+title: "[Removal]: "
+labels: ["removal-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The full process is in [docs/POLICY.md](https://github.com/sightmap/atlas/blob/main/docs/POLICY.md): acknowledgment
+        within 72 hours; on ownership verification the entry is deleted, the slug is
+        tombstoned, and the site rebuild purges pages and assets. Formal DMCA notices
+        follow the same path and are honored promptly.
+  - type: input
+    id: domain
+    attributes:
+      label: Domain
+      description: The domain you own that the map covers.
+      placeholder: example.com
+    validations:
+      required: true
+  - type: input
+    id: entry
+    attributes:
+      label: Atlas entry
+      description: The entry slug or a link to the entry folder, if you know it.
+      placeholder: entries/example-product
+    validations:
+      required: false
+  - type: dropdown
+    id: proof-method
+    attributes:
+      label: Proof of ownership
+      description: Pick how you will verify ownership. A maintainer will follow up with the exact steps.
+      options:
+        - "Email from an address at the domain"
+        - "DNS TXT record on the domain"
+        - "File placed at the site root"
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: What should be removed?
+      options:
+        - "The entire entry"
+        - "Screenshots only"
+        - "Specific content (describe below) — a correction, not a removal"
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: For partial removals or corrections, describe exactly what should change. Do not paste sensitive data here — describe it instead.
+    validations:
+      required: false
+  - type: checkboxes
+    id: affirmation
+    attributes:
+      label: Affirmation
+      options:
+        - label: I am the owner of this domain, or authorized to act on the owner's behalf.
+          required: true

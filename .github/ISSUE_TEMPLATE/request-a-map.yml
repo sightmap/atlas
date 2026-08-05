@@ -1,0 +1,54 @@
+name: Request a map
+description: Suggest a site for the atlas, or ask whether a target passes the content policy before mapping it.
+title: "[Map request]: "
+labels: ["map-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Want a site mapped, or planning to map one yourself and unsure it qualifies?
+        Fill this in. Eligibility rules live in [docs/POLICY.md](https://github.com/sightmap/atlas/blob/main/docs/POLICY.md).
+  - type: input
+    id: site-url
+    attributes:
+      label: Site URL
+      description: The product's primary URL (the value that would become `site_url`).
+      placeholder: https://example.com/product
+    validations:
+      required: true
+  - type: textarea
+    id: why-valuable
+    attributes:
+      label: Why is this map valuable?
+      description: Who would use it, and for what? Recognizable products, agent-friendly surfaces, and commonly automated flows rank higher.
+      placeholder: Agents frequently need to drive this site because...
+    validations:
+      required: true
+  - type: dropdown
+    id: auth-level
+    attributes:
+      label: Auth level (per POLICY.md)
+      description: How much of the surface is reachable, and under which policy exception if not public?
+      options:
+        - "none — publicly accessible without an account"
+        - "self-hosted — open-source software you run yourself"
+        - "demo-account — public demo/sandbox instance the vendor operates"
+        - "vendor permission — documented permission (link it below)"
+        - "auth-walled, no exception applies — likely ineligible"
+        - "not sure — asking"
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything else — vendor permission links, bot defenses you expect, surfaces worth prioritizing.
+    validations:
+      required: false
+  - type: checkboxes
+    id: policy-check
+    attributes:
+      label: Policy check
+      options:
+        - label: I have read [docs/POLICY.md](https://github.com/sightmap/atlas/blob/main/docs/POLICY.md) and believe this target is eligible (or I am asking).
+          required: true

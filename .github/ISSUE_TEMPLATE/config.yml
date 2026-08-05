@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Contributing guide
+    url: https://github.com/sightmap/atlas/blob/main/CONTRIBUTING.md
+    about: How to author and submit a map — read this before opening a PR.
+  - name: Content policy
+    url: https://github.com/sightmap/atlas/blob/main/docs/POLICY.md
+    about: What the atlas accepts, hard content rules, and the removal process.
