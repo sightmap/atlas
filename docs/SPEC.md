@@ -1,0 +1,114 @@
+# Atlas entry specification
+
+Normative for this repo. CI enforces everything marked **enforced**.
+
+## Directory layout
+
+```
+entries/<slug>/
+  README.md              # front matter (metadata source of truth) + free-form notes
+  .sightmap/             # the corpus, per the sightmap authoring conventions
+    config.yaml          #   pins spec version
+    <route>.yaml …       #   one file per top-level route
+    shared.yaml          #   cross-route components (as needed)
+    extras.yaml          #   route-less modals, third-party widgets (as needed)
+    snapshots/           #   optional .snap + .snap.tree.json pairs — MUST live inside
+                         #   .sightmap/ so `sightmap lint --all-snapshots` and offline
+                         #   coverage find them
+  screenshots/
+    01-<name>.png …      # see screenshot rules
+removed.yaml             # tombstones; removed slugs may never be reused
+index.json               # GENERATED on merge — never edit by hand
+schema/entry.schema.json # JSON Schema for the front matter below
+```
+
+## Slug rules (enforced)
+
+- Free-form product slug, kebab-case, `^[a-z0-9][a-z0-9-]{1,63}$`. Folder name must equal front-matter `slug`.
+- Product-keyed, not domain-keyed: one domain may host many products, one product may span domains. `square-pos`, not `squareup.com`.
+- Unique against `entries/` and `removed.yaml`.
+
+## Front matter (enforced against schema/entry.schema.json)
+
+```yaml
+---
+name: Square POS                # display name, ≤50 chars
+slug: square-pos                # == folder name
+site_url: https://squareup.com/us/en/point-of-sale
+domains: [squareup.com]         # 1–5 domains the map covers
+description: Register, inventory, and reporting surfaces of Square's point of sale.  # ≤140 chars
+categories: [pos, commerce]     # 1–3 from the closed enum below
+author: trevor-handle           # GitHub handle of the mapper
+created: 2026-08-05
+updated: 2026-08-05             # bump on any content change
+last_verified: 2026-08-05       # last date selectors were probed against the live site
+cli_version: 0.1.0              # sightmap CLI used
+spec_version: 1                 # sightmap spec version (must match .sightmap/config.yaml)
+method: browser                 # browser | hybrid
+auth: none                      # none | demo-account | self-hosted  (see POLICY.md)
+---
+```
+
+Body below the front matter is free-form: coverage notes, quirks, known gaps. No stats in front matter — counts are computed by CI (`sightmap stats --json`) and live only in `index.json`.
+
+**Category enum** (closed; CI rejects anything else): `commerce`, `pos`, `saas`, `devtools`, `docs`, `finance`, `travel`, `media`, `social`, `government`, `education`, `other`.
+
+## Corpus rules (enforced)
+
+- `sightmap validate` passes; `sightmap lint` passes (warnings allowed only with a justifying note in the README body).
+- `config.yaml` pins `version` and matches front-matter `spec_version`.
+- No `source:` / `dependencies:` keys — atlas maps are observed, not source-derived.
+- Selectors verified against the live site at authoring time (`sightmap sel-probe`); record the date in `last_verified`.
+
+## Screenshot rules (enforced)
+
+- `screenshots/NN-<kebab-name>.png`, NN starting at `01`; 1–5 images per entry.
+- ≤300 KB each, width 1200–2000 px, PNG or WebP.
+- Public, non-sensitive screens only; no personal data, no real customer records (see POLICY.md). Demo/sandbox data must look like demo data.
+
+## index.json (generated)
+
+Built on every merge to `main` by CI; consumed by sightmap.org/atlas and by `sightmap add`. Schema:
+
+```json
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-05T00:00:00Z",
+  "entries": [
+    {
+      "slug": "square-pos",
+      "name": "Square POS",
+      "site_url": "https://…",
+      "domains": ["squareup.com"],
+      "description": "…",
+      "categories": ["pos", "commerce"],
+      "author": "trevor-handle",
+      "created": "2026-08-05",
+      "updated": "2026-08-05",
+      "last_verified": "2026-08-05",
+      "cli_version": "0.1.0",
+      "spec_version": 1,
+      "method": "browser",
+      "auth": "none",
+      "stats": { "views": 12, "components": 87, "requests": 23, "properties": 31, "memory": 9 },
+      "per_view": [ { "name": "Register", "route": "/register", "components": 14, "requests": 4 } ],
+      "screenshots": ["screenshots/01-register.png"],
+      "files": [".sightmap/config.yaml", ".sightmap/register.yaml"],
+      "commit": "<sha of last commit touching this entry>"
+    }
+  ]
+}
+```
+
+Contracts that must not drift:
+- `files[]` lists every corpus file relative to the entry dir, `.sightmap/`-prefixed — `sightmap add` fetches exactly these.
+- `stats` / `per_view` come from `sightmap stats --json`, never hand-computed.
+- `commit` lets consumers fetch immutably.
+
+## removed.yaml
+
+```yaml
+- slug: acme-pos
+  removed: 2026-09-01
+  reason: owner-request        # owner-request | policy | superseded-by:<slug>
+```
