@@ -1,0 +1,175 @@
+# comment — sticky PR comment + labels from validation results (P2.3).
+#
+# Privileged half of the two-workflow split: validate.yml runs unprivileged
+# against fork PRs and uploads a `validation-result` artifact; this workflow
+# fires on its completion (workflow_run always executes the DEFAULT branch's
+# copy, with a write token) and turns the artifact into
+#   - ONE sticky PR comment (marker-comment pattern, updated in place), and
+#   - a `ready-for-review` or `validation-failed` label.
+#
+# Safety: this workflow never checks out or executes PR content. The artifact
+# is attacker-influenced data — it is parsed as JSON, escaped, truncated, and
+# rendered as comment text only. The target PR is resolved from the validate
+# run's head SHA via the commits API, never from artifact contents.
+#
+# Skipped/no-entry PRs upload no artifact; this workflow then does nothing.
+
+name: comment
+
+on:
+  workflow_run:
+    workflows: [validate]
+    types: [completed]
+
+permissions:
+  actions: read # download the validation-result artifact
+  contents: read
+  issues: write # labels + comments (PR comments are issue comments)
+  pull-requests: write
+
+jobs:
+  comment:
+    # Run only for PR-triggered validate runs that actually finished
+    # (a cancelled run has no trustworthy result to report).
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      (github.event.workflow_run.conclusion == 'success' ||
+       github.event.workflow_run.conclusion == 'failure')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Look for a validation-result artifact
+        id: artifact
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+              per_page: 100,
+            });
+            const found = data.artifacts.some((a) => a.name === 'validation-result');
+            core.setOutput('found', found ? 'true' : 'false');
+            if (!found) {
+              core.info('no validation-result artifact (docs/plan-only PR or early crash); nothing to do');
+            }
+
+      - name: Download validation result
+        if: steps.artifact.outputs.found == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: validation-result
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: validation-result
+
+      - name: Post sticky comment and apply label
+        if: steps.artifact.outputs.found == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const run = context.payload.workflow_run;
+            const { owner, repo } = context.repo;
+
+            const readJson = (p) => {
+              try { return JSON.parse(fs.readFileSync(p, 'utf8')); } catch { return null; }
+            };
+            const result = readJson('validation-result/result.json');
+            const meta = readJson('validation-result/meta.json') ?? {};
+
+            // Resolve the PR from the validate run's head SHA. The artifact's
+            // pr number is attacker-influenced, so it is only used as a
+            // fallback and then verified against the head SHA.
+            let pr = null;
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner, repo, commit_sha: run.head_sha,
+            });
+            pr = prs.find((p) => p.head.sha === run.head_sha && p.state === 'open') ?? null;
+            if (!pr && Number.isInteger(meta.pr)) {
+              try {
+                const { data: candidate } = await github.rest.pulls.get({
+                  owner, repo, pull_number: meta.pr,
+                });
+                if (candidate.head.sha === run.head_sha && candidate.state === 'open') {
+                  pr = candidate;
+                }
+              } catch (e) {
+                core.info(`fallback PR lookup #${meta.pr} failed: ${e.message}`);
+              }
+            }
+            if (!pr) {
+              core.info(`no open PR found for head ${run.head_sha}; nothing to do`);
+              return;
+            }
+
+            // Artifact contents are data, not markup: escape, neutralize
+            // @mentions, collapse newlines, truncate.
+            const esc = (s) =>
+              String(s ?? '')
+                .replace(/[\\`|]/g, (ch) => '\\' + ch)
+                .replace(/@/g, '@​') // zero-width space defuses @mentions
+                .replace(/\r?\n/g, ' ')
+                .slice(0, 400);
+
+            const ok = result?.ok === true;
+            const checks = Array.isArray(result?.checks) ? result.checks : [];
+            const slug =
+              typeof meta.slug === 'string' && /^[a-z0-9][a-z0-9-]{1,63}$/.test(meta.slug)
+                ? meta.slug
+                : null;
+
+            const rows = checks
+              .map((c) => `| ${c?.ok ? '✅' : '❌'} | \`${esc(c?.name)}\` | ${esc(c?.detail)} |`)
+              .join('\n');
+            const marker = '<!-- atlas-validation-result -->';
+            const body = [
+              marker,
+              `## Atlas entry validation: ${ok ? '✅ PASS' : '❌ FAIL'}`,
+              '',
+              slug ? `Entry: \`entries/${slug}/\`` : null,
+              `Head commit: \`${run.head_sha}\``,
+              '',
+              '| | Check | Detail |',
+              '|---|-------|--------|',
+              rows ||
+                `| ❌ | \`validate-entry\` | no parseable result; see the [workflow run](${run.html_url}) logs |`,
+              '',
+              `_Posted by the atlas validation bot from [validate run #${run.run_number}](${run.html_url}); this comment is updated in place on every push._`,
+            ].filter((line) => line !== null).join('\n');
+
+            // Sticky comment: update the existing marker comment or create one.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: pr.number, per_page: 100,
+            });
+            const previous = comments.find((c) => c.body && c.body.includes(marker));
+            if (previous) {
+              await github.rest.issues.updateComment({
+                owner, repo, comment_id: previous.id, body,
+              });
+              core.info(`updated sticky comment ${previous.id} on PR #${pr.number}`);
+            } else {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: pr.number, body,
+              });
+              core.info(`created sticky comment on PR #${pr.number}`);
+            }
+
+            // Labels: exactly one of ready-for-review / validation-failed.
+            const addLabel = ok ? 'ready-for-review' : 'validation-failed';
+            const removeLabel = ok ? 'validation-failed' : 'ready-for-review';
+            try {
+              await github.rest.issues.addLabels({
+                owner, repo, issue_number: pr.number, labels: [addLabel],
+              });
+            } catch (e) {
+              core.warning(`could not add label "${addLabel}": ${e.message}`);
+            }
+            try {
+              await github.rest.issues.removeLabel({
+                owner, repo, issue_number: pr.number, name: removeLabel,
+              });
+            } catch (e) {
+              if (e.status !== 404) throw e; // 404 = label wasn't set; fine
+            }

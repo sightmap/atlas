@@ -1,0 +1,215 @@
+# validate — PR entry validation (P2.3).
+#
+# Runs on every pull request, UNPRIVILEGED: no secrets, read-only token.
+# Fork PRs are the normal case; this workflow must stay safe to run against
+# arbitrary PR content. Untrusted input is only ever treated as data:
+#   - changed-path detection runs before any npm/go execution, and npm ci /
+#     scripts/ only run when the PR touches nothing but entries/<slug>/
+#     (so package.json, package-lock.json and scripts/* are the base
+#     branch's versions from the merge commit),
+#   - the sightmap CLI is built from a pinned monorepo ref, never from PR
+#     content,
+#   - PR-supplied values (slugs, file paths) reach shell steps only via
+#     `env:`, never inline ${{ }} interpolation.
+#
+# Results are uploaded as the `validation-result` artifact; the privileged
+# comment.yml workflow (workflow_run) turns it into a sticky PR comment and
+# labels. Docs/plan-only PRs skip validation cleanly and upload no artifact.
+#
+# Only first-party actions/* actions are used; changed-path detection is
+# plain git.
+
+name: validate
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  # Pinned sightmap CLI ref. MUST stay in sync with PINNED_SIGHTMAP_REF in
+  # scripts/lib/sightmap-cli.mjs.
+  #
+  # Bump procedure: update BOTH this value and PINNED_SIGHTMAP_REF (and the
+  # copy in publish.yml) to the new tag or commit SHA, run
+  # `node scripts/validate-entry.mjs fixtures/valid-entry` and
+  # `node scripts/validate-entry.mjs fixtures/invalid-entry` locally against
+  # a CLI built from that ref, and land the bump as its own PR so entry
+  # validation changes are attributable to the CLI bump.
+  SIGHTMAP_REF: main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out PR merge commit (full history)
+        uses: actions/checkout@v4
+        with:
+          # Full history so the merge-base diff against origin/<base> works.
+          fetch-depth: 0
+
+      - name: Detect changed entry
+        id: detect
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          base="origin/${BASE_REF}"
+          if ! git rev-parse --verify --quiet "${base}^{commit}" >/dev/null; then
+            git fetch --no-tags origin "+refs/heads/${BASE_REF}:refs/remotes/origin/${BASE_REF}"
+          fi
+
+          # Three-dot diff = merge-base..HEAD = exactly this PR's changes.
+          mapfile -t changed < <(git diff --name-only --no-renames "${base}...HEAD")
+          echo "changed files (${#changed[@]}):"
+          printf '  %s\n' "${changed[@]:-<none>}"
+
+          entry_slugs=()
+          other=()
+          for f in "${changed[@]:-}"; do
+            [ -n "$f" ] || continue
+            if [[ "$f" =~ ^entries/([^/]+)/ ]]; then
+              entry_slugs+=("${BASH_REMATCH[1]}")
+            else
+              other+=("$f")
+            fi
+          done
+          mapfile -t slugs < <(printf '%s\n' "${entry_slugs[@]:-}" | sed '/^$/d' | sort -u)
+
+          mode=""
+          slug=""
+          message=""
+          if [ "${#slugs[@]}" -eq 0 ]; then
+            mode=skip
+            message="no entries/<slug>/ paths changed; entry validation skipped (docs/plan-only PR)"
+          elif [ "${#slugs[@]}" -gt 1 ]; then
+            mode=fail
+            message="this PR touches ${#slugs[@]} entry directories ($(IFS=', '; echo "${slugs[*]}")) — atlas PRs must touch exactly one entries/<slug>/ directory; split it into one PR per entry"
+          elif [ "${#other[@]}" -gt 0 ]; then
+            mode=fail
+            message="this PR mixes entries/${slugs[0]}/ with other files ($(IFS=', '; echo "${other[*]}")) — an entry PR must touch only its own entries/<slug>/ directory; move unrelated changes to a separate PR"
+          elif [ ! -d "entries/${slugs[0]}" ]; then
+            mode=fail
+            message="entries/${slugs[0]}/ no longer exists in this PR — entry removals are maintainer-driven (tombstone in removed.yaml, see docs/POLICY.md), not plain deletion PRs"
+          else
+            mode=validate
+            slug="${slugs[0]}"
+          fi
+
+          {
+            echo "mode=${mode}"
+            echo "slug=${slug}"
+            echo "message=${message}"
+          } >> "$GITHUB_OUTPUT"
+          echo "mode=${mode} slug=${slug}"
+          [ -z "$message" ] || echo "reason: ${message}"
+
+      - name: Record structural failure
+        if: steps.detect.outputs.mode == 'fail'
+        env:
+          MESSAGE: ${{ steps.detect.outputs.message }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p validation-result
+          jq -n --arg detail "$MESSAGE" \
+            '{ok: false, checks: [{name: "changed-paths", ok: false, detail: $detail}]}' \
+            > validation-result/result.json
+          jq -n --argjson pr "$PR_NUMBER" --arg head_sha "$HEAD_SHA" --arg slug "" \
+            '{pr: $pr, head_sha: $head_sha, slug: $slug}' \
+            > validation-result/meta.json
+
+      - name: Set up Node
+        if: steps.detect.outputs.mode == 'validate'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install script dependencies
+        if: steps.detect.outputs.mode == 'validate'
+        run: npm ci
+
+      - name: Set up Go
+        if: steps.detect.outputs.mode == 'validate'
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false # no go.sum in this repo; the module cache is keyless
+
+      - name: Build pinned sightmap CLI
+        if: steps.detect.outputs.mode == 'validate'
+        run: |
+          set -euo pipefail
+          go install "github.com/sightmap/sightmap/go/cmd/sightmap@${SIGHTMAP_REF}"
+          echo "SIGHTMAP_BIN=$(go env GOPATH)/bin/sightmap" >> "$GITHUB_ENV"
+
+      - name: Run validate-entry on the changed entry
+        if: steps.detect.outputs.mode == 'validate'
+        id: validate
+        env:
+          SLUG: ${{ steps.detect.outputs.slug }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p validation-result
+          set +e
+          node scripts/validate-entry.mjs "entries/${SLUG}" --json \
+            > validation-result/result.json
+          status=$?
+          set -e
+          echo "validate-entry exited ${status}"
+          if ! jq -e . validation-result/result.json >/dev/null 2>&1; then
+            jq -n --arg detail "validate-entry produced no parseable JSON (exit ${status}); see this workflow run's logs" \
+              '{ok: false, checks: [{name: "validate-entry", ok: false, detail: $detail}]}' \
+              > validation-result/result.json
+          fi
+          jq -n --argjson pr "$PR_NUMBER" --arg head_sha "$HEAD_SHA" --arg slug "$SLUG" \
+            '{pr: $pr, head_sha: $head_sha, slug: $slug}' \
+            > validation-result/meta.json
+          jq . validation-result/result.json
+          echo "exit-code=${status}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload validation result
+        if: steps.detect.outputs.mode == 'validate' || steps.detect.outputs.mode == 'fail'
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-result
+          path: validation-result/
+          retention-days: 7
+
+      - name: Conclude
+        env:
+          MODE: ${{ steps.detect.outputs.mode }}
+          MESSAGE: ${{ steps.detect.outputs.message }}
+          VALIDATE_EXIT: ${{ steps.validate.outputs.exit-code }}
+        run: |
+          set -euo pipefail
+          case "$MODE" in
+            skip)
+              echo "::notice::${MESSAGE}"
+              ;;
+            fail)
+              echo "::error::${MESSAGE}"
+              exit 1
+              ;;
+            validate)
+              if [ "${VALIDATE_EXIT}" != "0" ]; then
+                echo "::error::validate-entry failed (exit ${VALIDATE_EXIT}); see the check output above — the sticky PR comment lists each failing check"
+                exit 1
+              fi
+              echo "entry validation passed"
+              ;;
+            *)
+              echo "::error::internal error: unknown detect mode '${MODE}'"
+              exit 1
+              ;;
+          esac

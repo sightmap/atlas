@@ -1,0 +1,192 @@
+# publish — regenerate index.json on merge and vendor it into the monorepo (P2.4).
+#
+# On every push to main:
+#   1. rebuild index.json with scripts/gen-index.mjs (stats come from the
+#      pinned sightmap CLI — NEVER hand-computed, never --allow-missing-stats
+#      here: the published index must always carry full stats),
+#   2. if index.json changed, commit it back to main with [skip ci]
+#      (GitHub natively skips workflows for that trailer, so this cannot
+#      retrigger itself; the `publish` concurrency group serializes runs
+#      from rapid merges),
+#   3. vendor index.json + all entry screenshots into sightmap/sightmap as
+#      ONE rolling PR (branch atlas-vendoring, force-pushed). sightmap.org's
+#      build stays fully local — atlas data reaches it only via this PR,
+#      never a network fetch at build time. The PR is NEVER auto-merged.
+#
+# The vendoring step is guarded on the ATLAS_BOT_TOKEN secret (fine-grained
+# PAT with contents+PR write on sightmap/sightmap — see plan/IMPLEMENTATION.md
+# "Provisioning"). Without it the step logs a notice and exits 0 so forks and
+# pre-provisioning merges stay green.
+#
+# NOTE: gen-index requires the `stats` verb (sightmap/sightmap PR #167,
+# branch feat/stats-verb). Until that merges into the pinned ref, this
+# workflow fails at the "Regenerate index.json" step by design.
+
+name: publish
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write # push the regenerated index.json back to main
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+env:
+  # Pinned sightmap CLI ref. MUST stay in sync with PINNED_SIGHTMAP_REF in
+  # scripts/lib/sightmap-cli.mjs.
+  #
+  # Bump procedure: update BOTH this value and PINNED_SIGHTMAP_REF (and the
+  # copy in validate.yml) to the new tag or commit SHA, run
+  # `node scripts/validate-entry.mjs fixtures/valid-entry` and
+  # `node scripts/gen-index.mjs --out /tmp/index.json` locally against a CLI
+  # built from that ref, and land the bump as its own PR so index changes are
+  # attributable to the CLI bump.
+  SIGHTMAP_REF: main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out main (full history)
+        uses: actions/checkout@v4
+        with:
+          # Full history: gen-index records per-entry provenance via
+          # `git log -1 --format=%H -- entries/<slug>` — a shallow clone
+          # would yield wrong or empty commit SHAs.
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install script dependencies
+        run: npm ci
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+          cache: false # no go.sum in this repo; the module cache is keyless
+
+      - name: Build pinned sightmap CLI
+        run: |
+          set -euo pipefail
+          go install "github.com/sightmap/sightmap/go/cmd/sightmap@${SIGHTMAP_REF}"
+          echo "SIGHTMAP_BIN=$(go env GOPATH)/bin/sightmap" >> "$GITHUB_ENV"
+
+      - name: Regenerate index.json
+        run: node scripts/gen-index.mjs
+
+      - name: Commit index.json to main if changed
+        run: |
+          set -euo pipefail
+          git add index.json
+          if git diff --cached --quiet; then
+            echo "index.json is unchanged; nothing to commit"
+            exit 0
+          fi
+          # gen-index stamps generated_at on every run; a diff consisting of
+          # nothing but that timestamp is not a real change — don't spam main
+          # with a bot commit per docs-only merge.
+          meaningful="$(git diff --cached -U0 -- index.json \
+            | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' \
+            | grep -v '"generated_at":' || true)"
+          if [ -z "${meaningful}" ]; then
+            echo "index.json differs only in generated_at; skipping commit"
+            git reset -q -- index.json
+            git checkout -q -- index.json
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898062+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Regenerate index.json [skip ci]"
+          # A merge may have landed while this run was queued; rebase so the
+          # push is fast-forward. (Its own publish run is queued behind this
+          # one in the `publish` concurrency group and will regenerate.)
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Vendor atlas data into sightmap/sightmap (rolling PR)
+        env:
+          ATLAS_BOT_TOKEN: ${{ secrets.ATLAS_BOT_TOKEN }}
+          GH_TOKEN: ${{ secrets.ATLAS_BOT_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          if [ -z "${ATLAS_BOT_TOKEN}" ]; then
+            echo "::notice::ATLAS_BOT_TOKEN is not configured; skipping the vendoring PR against sightmap/sightmap. Provision a fine-grained PAT with contents+PR write on sightmap/sightmap (see plan/IMPLEMENTATION.md, 'Provisioning needed from a maintainer')."
+            exit 0
+          fi
+
+          atlas_sha="$(git rev-parse HEAD)"
+
+          git clone --depth 1 \
+            "https://x-access-token:${ATLAS_BOT_TOKEN}@github.com/sightmap/sightmap.git" \
+            monorepo
+          cd monorepo
+          git checkout -B atlas-vendoring
+
+          # index.json → web/src/data/atlas/index.json
+          mkdir -p web/src/data/atlas
+          cp ../index.json web/src/data/atlas/index.json
+
+          # Screenshots → web/src/data/atlas/screenshots/<slug>/…
+          # Wipe-and-recreate so takedowns fully propagate: assets of removed
+          # entries must vanish from the vendored tree, not linger.
+          rm -rf web/src/data/atlas/screenshots
+          mkdir -p web/src/data/atlas/screenshots
+          for dir in ../entries/*/screenshots; do
+            [ -d "$dir" ] || continue
+            slug="$(basename "$(dirname "$dir")")"
+            shots=("$dir"/*)
+            [ "${#shots[@]}" -gt 0 ] || continue
+            mkdir -p "web/src/data/atlas/screenshots/${slug}"
+            cp "${shots[@]}" "web/src/data/atlas/screenshots/${slug}/"
+          done
+
+          git add web/src/data/atlas
+          if git diff --cached --quiet; then
+            echo "vendored atlas data is already up to date; nothing to push"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898062+github-actions[bot]@users.noreply.github.com"
+          git commit \
+            -m "Vendor atlas index.json and screenshots" \
+            -m "Automated rolling update from the sightmap/atlas publish workflow (atlas commit ${atlas_sha}). Do not auto-merge."
+          git push --force origin atlas-vendoring
+
+          # ONE rolling PR: the force-push above already updated an open PR
+          # if it exists; otherwise open it. Never enable auto-merge.
+          open_pr="$(gh pr list --repo sightmap/sightmap --head atlas-vendoring \
+            --state open --json number --jq '.[].number')"
+          if [ -z "${open_pr}" ]; then
+            gh pr create --repo sightmap/sightmap \
+              --head atlas-vendoring --base main \
+              --title "Vendor atlas data (rolling)" \
+              --body "$(printf '%s\n' \
+                'Rolling PR that vendors generated atlas data into the site build:' \
+                '' \
+                '- `web/src/data/atlas/index.json`' \
+                '- `web/src/data/atlas/screenshots/<slug>/…`' \
+                '' \
+                "Force-updated by the [sightmap/atlas publish workflow](https://github.com/sightmap/atlas/actions/workflows/publish.yml) on every atlas merge; this update is from atlas commit ${atlas_sha}." \
+                '' \
+                'Review and merge manually — never enable auto-merge (sightmap.org must not deploy unreviewed community data; see plan/IMPLEMENTATION.md architecture invariants in sightmap/atlas).')"
+            echo "opened rolling vendoring PR"
+          else
+            echo "rolling vendoring PR #${open_pr} already open; force-push updated it"
+          fi
