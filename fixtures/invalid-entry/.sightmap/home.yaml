@@ -1,0 +1,15 @@
+version: 1
+
+views:
+  - name: Home
+    route: /
+    source: src/pages/Home.tsx
+    components:
+      - name: HeroBanner
+        selector: '[data-component="HeroBanner"]'
+        source: src/components/HeroBanner.tsx
+        dependencies:
+          - src/components/Banner.tsx
+        properties:
+          - name: headline
+            extract: h1
