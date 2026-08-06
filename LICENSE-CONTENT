@@ -8,9 +8,9 @@ Plain-language summary: https://creativecommons.org/licenses/by/4.0/
 
 Contributor-authored material in atlas entries (`entries/<slug>/`):
 
-- `.sightmap/` corpus YAML — view and component names, selectors, properties,
+- `.sightmap/` corpus YAML: view and component names, selectors, properties,
   request definitions, and memory notes
-- `README.md` prose — coverage notes, quirks, known gaps
+- `README.md` prose: coverage notes, quirks, known gaps
 - front-matter metadata
 
 Anyone may copy, redistribute, adapt, and use this material, including
@@ -30,7 +30,7 @@ inclusion implies no endorsement or affiliation. See docs/POLICY.md for the
 removal process.
 
 **Mapped websites themselves** are not licensed by this repository. A sightmap
-describes a site's observable surface; it grants no rights in that site.
+describes a site's observable surface and grants no rights in that site.
 
 Tooling in this repository (`scripts/`, `schema/`, workflows) is MIT-licensed —
 see LICENSE.

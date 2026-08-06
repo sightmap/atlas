@@ -1,20 +1,21 @@
 # Sightmap Atlas
 
-A community atlas of [sightmaps](https://sightmap.org) — structured, machine-readable maps of real websites (views, components, properties, network requests), authored by agents browsing the live site with the [Sightmap CLI](https://github.com/sightmap/sightmap). No source access required.
+A community atlas of [sightmaps](https://sightmap.org): machine-readable maps of real websites — their views, components, properties, and network requests — written by agents browsing the live site with the [Sightmap CLI](https://github.com/sightmap/sightmap). No source access required.
 
-Wappalyzer tells you what a site is built with. A sightmap tells you what its surface *is* — named views and components an agent can navigate, drive, and build against.
+Wappalyzer tells you what a site is built with. A sightmap tells you what its surface offers: named views and components an agent can navigate, drive, and build against.
 
 ## Status
 
-Pre-launch. The repo is being built out phase by phase — see [plan/IMPLEMENTATION.md](plan/IMPLEMENTATION.md). Entry format and policies are specified in [docs/SPEC.md](docs/SPEC.md) and [docs/POLICY.md](docs/POLICY.md).
+Pre-launch, being built out phase by phase in [plan/IMPLEMENTATION.md](plan/IMPLEMENTATION.md). The entry format and content policy live in [docs/SPEC.md](docs/SPEC.md) and [docs/POLICY.md](docs/POLICY.md).
 
 ## Using a map
 
 ```
-sightmap add <slug>
+sightmap atlas find <domain>     # is this site already mapped?
+sightmap atlas add <slug>        # install its corpus into .sightmap/
 ```
 
-installs an entry's `.sightmap/` corpus into your project (CLI ≥ the version noted on each entry). Browse entries at sightmap.org/atlas (coming with launch) or under [entries/](entries/).
+Browse entries at sightmap.org/atlas (coming with launch) or under [entries/](entries/). Each entry notes the CLI version it was written against.
 
 ## Contributing a map
 
@@ -22,8 +23,8 @@ Coming with launch: a `map-a-site` agent skill that walks any coding agent throu
 
 ## Removal requests
 
-Site owner and want a map removed or corrected? Open a removal-request issue or email atlas@sightmap.org — see [docs/POLICY.md](docs/POLICY.md).
+Site owners can have a map removed or corrected. Open a removal-request issue or email atlas@sightmap.org. The process is in [docs/POLICY.md](docs/POLICY.md).
 
 ## License
 
-Entry content is [CC BY 4.0](LICENSE-CONTENT) — use it anywhere, including commercially, with credit to its author. Tooling (`scripts/`, `schema/`, workflows) is [MIT](LICENSE). Screenshots depict third-party interfaces and are included for identification and commentary; those rights stay with their owners.
+Entry content is [CC BY 4.0](LICENSE-CONTENT): use it anywhere, including commercially, with credit to its author. Tooling (`scripts/`, `schema/`, workflows) is [MIT](LICENSE). Screenshots depict third-party interfaces and are included for identification and commentary, so those rights stay with their owners.
