@@ -4,20 +4,20 @@ Thanks for mapping the web. This guide is the human path to adding an entry;
 coding agents should use the [`map-a-site` skill](skills/map-a-site/SKILL.md),
 which walks the same process end to end.
 
-Contracts live in two documents — read them before anything else:
+Contracts live in two documents. Read them before anything else:
 
-- [docs/SPEC.md](docs/SPEC.md) — entry format: directory layout, front matter,
+- [docs/SPEC.md](docs/SPEC.md) covers the entry format: directory layout, front matter,
   corpus rules, screenshot rules.
-- [docs/POLICY.md](docs/POLICY.md) — what the atlas accepts, hard content
+- [docs/POLICY.md](docs/POLICY.md) covers what the atlas accepts, the hard content
   rules, and the removal process.
 
-## Step 0 — the policy gate
+## Step 0: the policy gate
 
 Before you map anything, check the target against
 [docs/POLICY.md](docs/POLICY.md):
 
-- **Publicly accessible surfaces** (no account needed) — default yes.
-- **Auth-walled products** — default **no**, with three exceptions, in order of
+- **Publicly accessible surfaces** (no account needed): default yes.
+- **Auth-walled products**: default **no**, with three exceptions, in order of
   preference: self-hosted/open-source software you run yourself
   (`auth: self-hosted`), documented vendor permission (linked in your entry
   README), or a public demo/sandbox instance the vendor operates.
@@ -29,7 +29,7 @@ If the target fails the gate, stop here. If you are unsure, open a
 [Request a map](https://github.com/sightmap/atlas/issues/new?template=request-a-map.yml)
 issue and ask before investing the work.
 
-## Step 1 — fork and scaffold
+## Step 1: fork and scaffold
 
 ```bash
 gh repo fork sightmap/atlas --clone
@@ -39,22 +39,22 @@ mkdir -p entries/<slug>/.sightmap entries/<slug>/screenshots
 ```
 
 Pick the slug per [docs/SPEC.md](docs/SPEC.md): kebab-case, product-keyed (not
-domain-keyed — `square-pos`, not `squareup.com`), matching
+domain-keyed: `square-pos`, not `squareup.com`), matching
 `^[a-z0-9][a-z0-9-]{1,63}$`, and unique against both `entries/` and
 `removed.yaml`.
 
-## Step 2 — author the entry
+## Step 2: author the entry
 
 Follow [docs/SPEC.md](docs/SPEC.md) exactly. In short:
 
-- `entries/<slug>/README.md` — front matter (the metadata source of truth)
+- `entries/<slug>/README.md` holds the front matter (the metadata source of truth)
   plus free-form notes on coverage, quirks, and known gaps.
-- `entries/<slug>/.sightmap/` — the corpus, authored per the monorepo's
+- `entries/<slug>/.sightmap/` holds the corpus, authored per the monorepo's
   [authoring conventions](https://github.com/sightmap/sightmap/blob/main/spec/v1/authoring-conventions.md):
   `config.yaml` pinning the spec version, one YAML file per top-level route,
   `shared.yaml` / `extras.yaml` as needed. Any snapshots must live inside
   `.sightmap/snapshots/`.
-- `entries/<slug>/screenshots/` — 1–5 images, `NN-<kebab-name>.png` (or
+- `entries/<slug>/screenshots/` holds 1–5 images, `NN-<kebab-name>.png` (or
   `.webp`), each ≤300 KB and 1200–2000 px wide. Public, non-sensitive screens
   only. A screenshot-less entry is always acceptable.
 
@@ -71,7 +71,7 @@ npm install -g @sightmap/sightmap && sightmap version
 go run github.com/sightmap/sightmap/go/cmd/sightmap@main version
 ```
 
-## Step 3 — validate locally
+## Step 3: validate locally
 
 From the repo root:
 
@@ -91,7 +91,7 @@ agreement, screenshot rules, and the observed-only corpus rules, then shells
 `sightmap validate` and `sightmap lint`. CI runs exactly the same script, so a
 green local run means a green PR check.
 
-## Step 4 — open the PR
+## Step 4: open the PR
 
 ```bash
 git add entries/<slug>
@@ -106,12 +106,12 @@ What to expect:
   one `entries/<slug>/` directory.
 - A bot comment posts the validation result and labels the PR
   `ready-for-review` or `validation-failed`. (Validation workflows land with
-  P2.3 — see
+  P2.3, see
   [plan/phases/phase-2-repo-scaffold.md](plan/phases/phase-2-repo-scaffold.md).)
 - A maintainer reviews for policy and quality. Maintainers may decline any
   entry for policy, quality, or legal-risk reasons (see
   [docs/POLICY.md](docs/POLICY.md)).
-- Never edit `index.json` — it is generated on merge.
+- Never edit `index.json`. It is generated on merge.
 
 ## The quality bar
 
@@ -123,7 +123,7 @@ Entries are held to the bar set for the seed entries
 - **Every view has at least one `memory:` note** capturing something
   non-obvious. The notes are the product.
 - **Requests documented** wherever traffic is observable.
-- **`last_verified` is the date you actually probed the selectors** — honestly.
+- **`last_verified` is the date you actually probed the selectors.** Be honest about it.
 - `sightmap validate` passes; `sightmap lint` passes, with any warnings
   justified by a note in the README body.
 
@@ -133,8 +133,7 @@ Entries are held to the bar set for the seed entries
   `updated` and `last_verified` in the front matter.
 - Site owners who want a map removed or corrected should use the
   [Removal request](https://github.com/sightmap/atlas/issues/new?template=removal-request.yml)
-  issue form — the process in [docs/POLICY.md](docs/POLICY.md) is
-  no-questions-asked.
+  issue form. The process in [docs/POLICY.md](docs/POLICY.md) is no-questions-asked.
 
 ## Licensing
 
@@ -146,7 +145,7 @@ and the gallery.
 
 Screenshots are the exception. They depict a third-party interface you don't
 own and can't license, so they're included for identification and commentary
-only, with all rights remaining with the interface's owner — which is why
+only, with all rights remaining with the interface's owner. That is why
 [docs/POLICY.md](docs/POLICY.md) keeps a no-questions-asked removal process.
 Submit only screenshots you captured yourself from publicly accessible pages.
 
