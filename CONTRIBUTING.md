@@ -138,9 +138,16 @@ Entries are held to the bar set for the seed entries
 
 ## Licensing
 
-**Placeholder — to be finalized before launch.** Scripts in this repository
-(`scripts/`) are intended to be MIT-licensed. The license for entry content
-(corpus YAML, README notes, screenshots) is still under discussion by the
-maintainers. No LICENSE file is present yet; until one lands, contributions
-are accepted under the understanding that a permissive content license will be
-proposed and flagged for explicit contributor visibility before launch.
+By submitting an entry you license your contribution under
+[CC BY 4.0](LICENSE-CONTENT): anyone may copy, adapt, and use it, including
+commercially, as long as they credit you. Your GitHub handle in the entry's
+front matter is that credit, and it travels with the entry into `index.json`
+and the gallery.
+
+Screenshots are the exception. They depict a third-party interface you don't
+own and can't license, so they're included for identification and commentary
+only, with all rights remaining with the interface's owner — which is why
+[docs/POLICY.md](docs/POLICY.md) keeps a no-questions-asked removal process.
+Submit only screenshots you captured yourself from publicly accessible pages.
+
+Repository tooling (`scripts/`, `schema/`, workflows) is [MIT](LICENSE).
