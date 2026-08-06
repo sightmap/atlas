@@ -23,7 +23,7 @@ Not legal advice; observed best practice from long-lived public galleries, appli
 
 Site owners can get a map removed or corrected, no questions asked:
 
-1. Open a **Removal request** issue (form provided) or email **TBD@sightmap.org**.
+1. Open a **Removal request** issue (form provided) or email **atlas@sightmap.org**.
 2. Acknowledgment within 72 hours.
 3. Ownership verified via a domain email, a DNS TXT record, or a file at the site root.
 4. On verification: entry deleted, slug tombstoned in `removed.yaml`, regenerated `index.json` published, and the sightmap.org/atlas rebuild removes the pages and assets from the CDN.

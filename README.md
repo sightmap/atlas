@@ -22,4 +22,8 @@ Coming with launch: a `map-a-site` agent skill that walks any coding agent throu
 
 ## Removal requests
 
-Site owner and want a map removed or corrected? See [docs/POLICY.md](docs/POLICY.md).
+Site owner and want a map removed or corrected? Open a removal-request issue or email atlas@sightmap.org — see [docs/POLICY.md](docs/POLICY.md).
+
+## License
+
+Entry content is [CC BY 4.0](LICENSE-CONTENT) — use it anywhere, including commercially, with credit to its author. Tooling (`scripts/`, `schema/`, workflows) is [MIT](LICENSE). Screenshots depict third-party interfaces and are included for identification and commentary; those rights stay with their owners.
