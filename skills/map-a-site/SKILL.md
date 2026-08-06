@@ -84,7 +84,10 @@ Work from the entry directory — the CLI operates on the `.sightmap/` in cwd:
 
 ```bash
 cd entries/<slug>
-sightmap browser start          # launches Chrome + overlay server
+# --headless keeps Chrome off the user's screen; the window size matters for
+# screenshots later (Step 7) — the default viewport is only 800px wide, below
+# the 1200px minimum SPEC requires.
+sightmap browser start --headless --chrome-flag=--window-size=1600,1200
 sightmap browser status         # expect: running, with a content tab listed
 sightmap snapshot --coverage --url 'https://<target>/'   # first look
 sightmap discover               # crawl links: mapped / surveyed / unseen routes
@@ -94,6 +97,22 @@ sightmap suggest --exclude-known  # candidate selectors not yet mapped
 Enumerate the top-level routes you will map. Async-rendered pages may need
 `--wait 1` (or more); a snapshot reporting 0 interactive nodes means the page
 was blank or still loading — never a finished page.
+
+**Then map what nothing links to.** `discover` crawls links, and no page links
+to its own error state, so link-following alone will always miss it. Visit a
+path that cannot exist and map whatever renders:
+
+```bash
+sightmap snapshot --coverage --url 'https://<target>/no-such-page-xyz'
+```
+
+Most SPAs answer with the app shell and a client-rendered not-found view, which
+means an HTTP status will not tell an agent it took a wrong turn — the view is
+the only signal, and that is exactly why the map needs it. Give it a catch-all
+route (`/**`); more specific views still win for their own routes. Other
+surfaces links rarely reach: states behind a query string (`?q=`), and anything
+that only appears after an interaction (modals, expanded menus) — reach those
+with `sightmap browser click` and snapshot again.
 
 ## Step 4 — author per-route YAML
 
@@ -141,11 +160,42 @@ sightmap validate            # must exit 0
 sightmap lint --warn-only    # any warning you keep needs a justifying note in README.md
 ```
 
+Two warnings you will almost certainly meet:
+
+- **`multi-instance-no-property`** on a prefix selector. Lint reads the YAML, not
+  the page, so `[data-component^="Hero"]` looks like it could match many elements
+  even when it matches exactly one. Do not silence it with `stability: unstable`
+  — that marks an accepted residual, which is a different claim. Give the
+  component a property that identifies the instance; when the hook is an
+  attribute, extracting that attribute is both the fix and useful data:
+
+  ```yaml
+  - name: Hero
+    selector: '[data-component^="Hero"]'
+    properties:
+      - name: component_id
+        extract: attr=data-component
+  ```
+
+- **`request is missing a name`**. Requests need `name` as well as `route` —
+  easy to miss when you are transcribing observed traffic rather than reading
+  the schema.
+
 ## Step 7 — screenshots
 
 `docs/SPEC.md` rules: 1–5 images, `screenshots/NN-<kebab-name>.png` (or
 `.webp`) starting at `01`, each **≤300 KB** and **1200–2000 px wide**, public
 non-sensitive screens only, demo data must look like demo data.
+
+**The capture is only as wide as the browser window.** A session started without
+a window size screenshots at 800px and every image fails the 1200px minimum —
+silently, because the CLI has no opinion about it. If you did not start the
+session as shown in Step 3, restart it now:
+
+```bash
+sightmap browser stop
+sightmap browser start --headless --chrome-flag=--window-size=1600,1200
+```
 
 ```bash
 # still in entries/<slug>/ :
@@ -158,12 +208,12 @@ Raw screenshots usually exceed 300 KB — compress (any one of these):
 ```bash
 cd screenshots
 magick raw-home.png -resize '1600x>' 01-home.webp        # ImageMagick → WebP
-cwebp -q 80 -resize 1600 0 raw-home.png -o 01-home.webp  # libwebp → WebP
+cwebp -q 82 raw-home.png -o 01-home.webp                 # libwebp → WebP
 pngquant --quality 60-80 --output 01-home.png raw-home.png  # staying with PNG
 
 # Verify (from entries/<slug>/):
 ls -l screenshots/            # each ≤ 300 KB
-identify screenshots/*        # width within 1200–2000 (ImageMagick), or use `file`
+sips -g pixelWidth screenshots/*   # width within 1200–2000 (macOS; or `identify`)
 ```
 
 Delete the raw captures; commit only the final `NN-` files.
