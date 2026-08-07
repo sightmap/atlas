@@ -121,4 +121,4 @@ views:
       - name: BelowResultsModules
         route: /sch/ajax/post/bos_modules
         method: POST
-        description: HTML fragment for the recommendation carousels below the item river. Fires once the bottom of the river comes into view.
+        description: HTML fragment for a recommendation carousel below the item river. Conditional — repeat visits to the same URL do not reliably fire it.
