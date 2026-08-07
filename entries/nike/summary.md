@@ -121,3 +121,83 @@ This is a third distinct failure mode, after Instacart (content present, hidden
 behind an auth modal) and Home Depot (homepage fine, deep routes refused). Worth
 adding to the skill's gate: a page that renders skeletons forever looks alive to
 every check except "did the data arrive".
+
+## Network capture
+
+This entry had one declared request and it was the browse page's own document
+load. Capture across four routes found 17 real endpoints, most on
+`api.nike.com`, taking Nike from the thinnest request coverage in the batch to
+among the richest.
+
+The product page is the find. Every identifier its four API calls need is
+already in the URL. From
+`/t/pegasus-premium-mens-road-running-shoes-kWXqW9yR/IV5663-012` the token
+ending the slug is the group key that keys availability, the last segment is the
+style colour that keys promotion visibility, and that segment with the colorway
+suffix dropped is the style code that keys the product record and the FAQ file.
+An agent holding the URL can address all four without reading the DOM. Uniqlo
+turned out to do the same thing, which suggests looking for it by default rather
+than as a curiosity.
+
+The page is assembled from independently deployed fragments under `/fragments/`,
+five of which load on every route. Which extra ones a route pulls names what
+that page is made of before any markup is read — a recommendations carousel on
+the product page, nothing extra elsewhere.
+
+The correction worth recording: a draft claimed the grid is fetched rather than
+served. It is served. All 24 cards are in the document, confirmed with
+JavaScript disabled, and the wall endpoint handles refining and paging past what
+arrived. The mistake came from seeing a plausible-looking API call and inferring
+the rest.
+
+### What the pass changed across all eight entries
+
+Every request in this batch was originally declared at the file root, which
+makes it global. The consumer counts global and view-scoped requests separately,
+so each entry reported zero requests on every view — the corpus said the sites
+made no per-page calls, which was false everywhere. Re-capturing four routes per
+site took the batch from 20 requests to 106.
+
+Five of the original 20 were the page's own document load, written up as though
+fetching the search page were an API call. They existed because a non-empty
+`requests:` block looked better than an absent one. An absent block is the
+honest output when a route fetches nothing; a padded one costs an agent a real
+lookup for no information.
+
+### Traps worth putting in the authoring skill
+
+**The network buffer is not cleared between navigations.** Capturing route A,
+navigating to route B, and reading the buffer attributes A's traffic to B. It
+looks plausible, which is what makes it dangerous — the first IKEA capture had
+product-page fetches filed under search, and only the `oref` parameter on an
+unrelated ad beacon gave it away. The fix is to record the highest request index
+before navigating and drop anything at or below it.
+
+**"Server-rendered" and "has no API" are different claims, and both need
+evidence.** Three drafts in this pass asserted that content was fetched when it
+was already in the document, or the reverse. `grep -c` counts matching lines
+rather than occurrences, and minified HTML puts everything on a handful of
+lines, which made a page with 24 product cards look like it had one. Fetching
+the URL with no JavaScript running and counting real occurrences settles it in
+one command, and should be a step rather than an inference.
+
+**Some endpoints are conditional and will not reproduce.** eBay's below-results
+carousel fired on one visit to a search URL and not on the next, from the same
+profile. Its placeholder containers are in the document either way and do not
+change size, so the DOM cannot be used to tell whether it loaded. Anything seen
+once should be described as conditional unless a second visit confirms it.
+
+### A schema gap this exposed
+
+Requests attach to a view or to the file root, and several of these belong to
+neither. IKEA fetches one HTML fragment per product card to fill its carousels,
+which happens on the home page, category browse, and product pages but not on
+search — the request belongs to the carousel, not to any of the three views. The
+same happens on eBay, where search and category browse share two endpoints
+because both are served by the search stack.
+
+The only way to express that today is to declare the request once per view,
+which is duplication that a reader cannot distinguish from three unrelated
+endpoints that happen to share a path. This is the same shape as the shells
+problem: the corpus can say "global" or "this one view", and the interesting
+cases are in between.
