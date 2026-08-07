@@ -91,3 +91,77 @@ A `severity` or `kind` marker on memory notes (say `hazard` versus `context`)
 would let `sightmap` surface just the traps for a route, and would give the
 gallery something concrete to show on an entry card beyond counts. Offered as an
 observation from authoring, not a request.
+
+## Network capture
+
+The four declared requests were mostly right about being global, but the cart
+calls are not — they fire only where an add-to-cart control exists, which is
+search and the product page, not the home page or bestsellers. More usefully,
+each of the four routes has a content loader of its own that had not been
+recorded at all.
+
+The clearest error was `LazyWidgetContent`, matched as `/acp/*/getAjaxContentHTML`.
+The real path grammar is `/acp/<widget-name>/<instance-id>/<operation>`, and
+three different operations appeared across four routes, so the old pattern caught
+roughly a third of the family. The widget name is the readable part and names
+the page region; the instance id repeats that name with a uuid and a timestamp
+and is per-render, so it is never worth matching on. This is a good argument for
+capturing more than one route before writing a glob — a single route makes a
+one-off look like the whole pattern.
+
+The pass also corrected a claim written during it. A draft said reviews are
+absent from the initial HTML; a fetch with no JavaScript returns eight of them.
+The lazy stream lengthens that section rather than creating it, and the original
+wording would have sent an agent hunting for something already on the page.
+
+### What the pass changed across all eight entries
+
+Every request in this batch was originally declared at the file root, which
+makes it global. The consumer counts global and view-scoped requests separately,
+so each entry reported zero requests on every view — the corpus said the sites
+made no per-page calls, which was false everywhere. Re-capturing four routes per
+site took the batch from 20 requests to 106.
+
+Five of the original 20 were the page's own document load, written up as though
+fetching the search page were an API call. They existed because a non-empty
+`requests:` block looked better than an absent one. An absent block is the
+honest output when a route fetches nothing; a padded one costs an agent a real
+lookup for no information.
+
+### Traps worth putting in the authoring skill
+
+**The network buffer is not cleared between navigations.** Capturing route A,
+navigating to route B, and reading the buffer attributes A's traffic to B. It
+looks plausible, which is what makes it dangerous — the first IKEA capture had
+product-page fetches filed under search, and only the `oref` parameter on an
+unrelated ad beacon gave it away. The fix is to record the highest request index
+before navigating and drop anything at or below it.
+
+**"Server-rendered" and "has no API" are different claims, and both need
+evidence.** Three drafts in this pass asserted that content was fetched when it
+was already in the document, or the reverse. `grep -c` counts matching lines
+rather than occurrences, and minified HTML puts everything on a handful of
+lines, which made a page with 24 product cards look like it had one. Fetching
+the URL with no JavaScript running and counting real occurrences settles it in
+one command, and should be a step rather than an inference.
+
+**Some endpoints are conditional and will not reproduce.** eBay's below-results
+carousel fired on one visit to a search URL and not on the next, from the same
+profile. Its placeholder containers are in the document either way and do not
+change size, so the DOM cannot be used to tell whether it loaded. Anything seen
+once should be described as conditional unless a second visit confirms it.
+
+### A schema gap this exposed
+
+Requests attach to a view or to the file root, and several of these belong to
+neither. IKEA fetches one HTML fragment per product card to fill its carousels,
+which happens on the home page, category browse, and product pages but not on
+search — the request belongs to the carousel, not to any of the three views. The
+same happens on eBay, where search and category browse share two endpoints
+because both are served by the search stack.
+
+The only way to express that today is to declare the request once per view,
+which is duplication that a reader cannot distinguish from three unrelated
+endpoints that happen to share a path. This is the same shape as the shells
+problem: the corpus can say "global" or "this one view", and the interesting
+cases are in between.
