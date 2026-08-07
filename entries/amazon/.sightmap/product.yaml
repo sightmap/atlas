@@ -128,4 +128,9 @@ views:
       - name: ReviewsLazyStream
         route: /portal/customer-reviews/ajax/lazy-widgets/stream
         method: POST
-        description: The review section below the fold. Reviews are not in the initial HTML, so a snapshot of an unscrolled product page has none of them.
+        description: Fills out the review section below the fold once it is scrolled toward.
+        memory:
+          - Eight reviews are already in the document, so the section is not
+            empty before this resolves — it is short. Counting what is on the
+            page is therefore not a count of the product's reviews; the total is
+            in the rating summary near the title.
