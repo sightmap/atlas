@@ -154,3 +154,23 @@ views:
           - Search-page legal notes, including the pricing disclaimer. It sits in
             `.x-footer`, a search-only block above the site-wide `#glbfooter`,
             so it is easy to mistake for part of the global footer.
+
+    requests:
+      - name: SearchImageExpand
+        route: /sch/ajax/multiple_images_expsvc
+        method: POST
+        description: Secondary photos for result cards that carry more than one image, returned as a listingId-keyed array of CDN URLs. Fires as those cards scroll into view.
+        response:
+          fields:
+            - name: items
+              type: array
+              description: One entry per listing, each with listingId and secondaryImages
+
+      - name: BelowResultsModules
+        route: /sch/ajax/post/bos_modules
+        method: POST
+        description: HTML fragment for the recommendation carousels below the result river, such as the brand rail. Fires once the bottom of the results comes into view.
+        memory:
+          - Returns markup rather than JSON, and the markup carries its own
+            `srp-bos-` classes that exist nowhere in the initial document. A
+            snapshot taken before the page is scrolled will not contain them.
