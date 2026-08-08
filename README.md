@@ -18,7 +18,7 @@ installs an entry's `.sightmap/` corpus into your project (CLI ≥ the version n
 
 ## Contributing a map
 
-Coming with launch: a `map-a-site` agent skill that walks any coding agent through mapping a site and opening the PR, plus a human guide in CONTRIBUTING.md. Until then, see [docs/SPEC.md](docs/SPEC.md) for the entry format.
+Humans: [CONTRIBUTING.md](CONTRIBUTING.md). Coding agents: the [`map-a-site` skill](skills/map-a-site/SKILL.md) walks the whole pipeline — policy check, live-site mapping, validation, screenshots, PR. Entry format: [docs/SPEC.md](docs/SPEC.md).
 
 ## Removal requests
 
