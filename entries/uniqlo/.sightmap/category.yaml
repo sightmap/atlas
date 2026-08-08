@@ -6,16 +6,14 @@ views:
     url: https://www.uniqlo.com/us/en/men/tops
     description: Category listing — sticky subcategory tabs above a product grid.
     memory:
-      - Identified by `.fr-ec-template-plp` on the content root. That class is a
-        more reliable page-type check than the URL, since the same
-        `/us/en/:gender/:path` shape also serves editorial pages.
-      - Subcategory navigation is a sticky tab strip (`.fr-ec-sticky-tabs`) whose
-        entries are links, so the whole subcategory tree can be walked without
-        clicking.
-      - The grid is `.fr-ec-product-collection` holding `.product-tile`
-        children, the same pair search renders, so one set of selectors covers
-        both surfaces. Do not reach for `.fr-ec-product-tile` — that class
-        belongs to the recommendation carousels, and this page has none.
+      - The route shape `/us/en/:gender/:path` also serves editorial pages.
+        Confirm `.fr-ec-template-plp` on the content root before treating a page
+        as a listing.
+      - Subcategory tabs are links, so the whole subcategory tree can be walked
+        without clicking any of them.
+      - This view renders no recommendation carousel, so `.fr-ec-product-tile`
+        matches nothing here. Results are `.product-tile` inside
+        `.fr-ec-product-collection`, the same pair search uses.
     components:
       - name: CategoryTemplate
         selector: '.fr-ec-template-plp'
@@ -31,8 +29,6 @@ views:
         properties:
           - name: lineup
             extract: text
-        memory:
-          - The category heading and its subcategory links.
 
       - name: ProductGrid
         selector: '.fr-ec-product-collection'

@@ -6,24 +6,23 @@ views:
     url: https://www.uniqlo.com/us/en/products/E465185-000/00
     description: Product page — gallery, options, a size comparison table, and related product carousels.
     memory:
-      - Identified by `.fr-ec-template-pdp` on the content root.
-      - Colour is part of the path, not a parameter, so each colourway is its own
-        URL. Loading one appends `?colorDisplayCode=` and `?sizeDisplayCode=` for
-        the default variant, which means the URL after load differs from the one
-        requested even on success.
-      - The product id shape is `E465185-000`. The leading `E` and the trailing
-        block are constant across the catalogue; only the middle digits vary.
-      - A `.product-table` sits inside the related-products section rather than
-        describing the product on the page, so it is easy to mistake for a spec
-        table.
+      - Loading a product URL appends `?colorDisplayCode=` and
+        `?sizeDisplayCode=`, so the address after load differs from the one
+        requested even on success. It is not a redirect.
+      - Nothing above the gallery and buy controls is purpose-named. Both
+        `.fr-ec-layout` and `.gutter-container` are site-wide primitives matching
+        dozens of nodes per view, so reach the controls by their own text or role.
+      - A recommendation carousel renders here as well, its tiles being
+        `.fr-ec-product-tile` inside `.fr-ec-carousel`. On this view
+        `.product-tile` matches only the related-products comparison table.
+      - The `.product-table` here compares related products. It is not a spec
+        table for the product being viewed.
     components:
       - name: ProductTemplate
         selector: '.fr-ec-template-pdp'
 
       - name: RelatedProducts
         selector: 'section[aria-label="Related Product List"]'
-        memory:
-          - Holds both the similar-products grid and the size comparison table.
         children:
           - name: ProductTable
             selector: '.product-table'
@@ -37,10 +36,9 @@ views:
         method: GET
         description: The buyable variants — size and colour combinations with their stock. Keyed by the two identifiers that make up this page's URL.
         memory:
-          - Both path parameters come straight from the address bar. For
-            `/us/en/products/E465185-000/00` the product id is `E465185-000` and
-            the price group is `00`, so every call this page makes is
-            constructible from the URL without reading the DOM.
+          - Both path parameters come straight from the address bar — the product
+            id and the price group are the two URL segments — so this call is
+            constructible without reading the DOM.
 
       - name: ProductReviews
         route: /us/api/commerce/v5/en/products/*/reviews
