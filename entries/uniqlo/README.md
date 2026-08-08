@@ -8,7 +8,7 @@ categories: [commerce]
 author: chiplay
 created: 2026-08-07
 updated: 2026-08-08
-last_verified: 2026-08-07
+last_verified: 2026-08-08
 cli_version: 0.18.0
 spec_version: 1
 method: browser

@@ -12,8 +12,10 @@ views:
       - Subcategory navigation is a sticky tab strip (`.fr-ec-sticky-tabs`) whose
         entries are links, so the whole subcategory tree can be walked without
         clicking.
-      - Uses the same `.fr-ec-product-tile` component as search, so one set of
-        selectors covers both surfaces.
+      - The grid is `.fr-ec-product-collection` holding `.product-tile`
+        children, the same pair search renders, so one set of selectors covers
+        both surfaces. Do not reach for `.fr-ec-product-tile` — that class
+        belongs to the recommendation carousels, and this page has none.
     components:
       - name: CategoryTemplate
         selector: '.fr-ec-template-plp'
@@ -32,14 +34,17 @@ views:
         memory:
           - The category heading and its subcategory links.
 
-      - name: ProductTile
-        selector: '.fr-ec-product-tile'
-        properties:
-          - name: tile_text
-            extract: text
+      - name: ProductGrid
+        selector: '.fr-ec-product-collection'
         children:
-          - name: TileImage
-            selector: '.fr-ec-product-tile__image'
+          - name: ProductTile
+            selector: '.product-tile'
+            properties:
+              - name: tile_text
+                extract: text
+            children:
+              - name: TileImage
+                selector: '.product-tile__carousel-wrapper'
 
     requests:
       - name: ProductSearch
