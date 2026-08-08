@@ -3,7 +3,7 @@ name: Zillow
 slug: zillow
 site_url: https://www.zillow.com/
 domains: [zillow.com, www.zillow.com]
-description: Zillow mapped signed in — landing page, search results, listing detail, saved homes and the 404, with the three incompatible card conventions between them.
+description: Zillow mapped signed in — landing page, search, listing detail, saved homes and the 404, and their three incompatible card conventions.
 categories: [commerce]
 author: chiplay
 created: 2026-08-08
