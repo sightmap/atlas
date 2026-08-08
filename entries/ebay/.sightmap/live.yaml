@@ -31,6 +31,3 @@ views:
           - Anchor to the `form`, not to the `.primary-filters` div inside it.
             The div misses the form element itself, which is what carries the
             accessible name.
-
-      - name: LiveEventsCarousel
-        selector: '#dp-live-events-carousel'

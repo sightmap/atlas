@@ -3,8 +3,8 @@ version: 1
 views:
   - name: CategoryBrowse
     route: /b/:categoryName/:categoryId/:browseNode
-    url: https://www.ebay.com/b/Toys-Hobbies/220/bn_1865497
-    description: Category browse — breadcrumbs, a category tree, refinements, and a grid of item cards.
+    url: https://www.ebay.com/b/Action-Figures/261068/bn_1642089
+    description: Category browse — breadcrumbs and a category tree, then either refinements and a grid of item cards or a set of merchandised modules.
     memory:
       - The name segment is decorative. `/b/Totally-Made-Up-Name/220/bn_1865497`
         loads Toys & Hobbies and rewrites the path to the canonical name, so an
@@ -24,7 +24,7 @@ views:
             extract: text
 
       - name: CategoryHeading
-        selector: '.textual-display'
+        selector: 'h1.textual-display'
         properties:
           - name: category_name
             extract: text
