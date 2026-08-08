@@ -7,7 +7,7 @@ description: Shopify storefront on Next.js — collections, product pages, searc
 categories: [commerce]
 author: chiplay
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-08-08
 last_verified: 2026-08-06
 cli_version: 0.18.0
 spec_version: 1
@@ -17,10 +17,8 @@ auth: none
 
 # Vuori
 
-A direct-to-consumer apparel storefront, mapped as a signed-out shopper. Shopify
-behind a Next.js front end with MUI components, which makes it a useful contrast
-to the big-box entries in the atlas: the same shopping surfaces, built from an
-entirely different stack.
+A direct-to-consumer apparel storefront, mapped as a signed-out shopper: Shopify
+behind a Next.js front end with MUI components.
 
 ## Coverage
 
@@ -37,10 +35,10 @@ entirely different stack.
 `GlobalFooter`, `FeedbackWidget`, and `BuildStamp` are global. All five views
 report `0 orphaned` coverage, with every selector `sel-probe`d on 2026-08-06.
 
-## What bites
+## Hazards
 
-**The 404 has an empty document title.** Not a message, not a code — `""`. Any
-agent that identifies pages by title gets nothing, and code branching on a title
+**The 404 has an empty document title.** `document.title` is `""`. Any agent
+that identifies pages by title gets nothing, and code branching on a title
 containing "404" or "not found" never fires. The only text signal is the h1,
 "The page you're looking for cannot be found", which also avoids the number. An
 unknown collection handle lands here too rather than redirecting.
