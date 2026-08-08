@@ -3,7 +3,7 @@ name: Spotify
 slug: spotify
 site_url: https://open.spotify.com/
 domains: [open.spotify.com]
-description: Spotify's web player album view, mapped signed in — album header, track list, and the playback chrome around them.
+description: Spotify's web player mapped signed in — album, playlist, artist, home, search and the 404, with the playback chrome around them.
 categories: [media]
 author: chiplay
 created: 2026-08-08
@@ -17,56 +17,69 @@ auth: personal-account
 
 # Spotify
 
-One view so far: an album page on the web player, mapped through a signed-in
-browser. The album itself is public; the account only supplies the session.
+Six views of the web player: album, playlist, artist, home, search results and
+the 404. 51 components, 4 requests, every selector counted on the route that
+declares it.
 
 ## Why this is `auth: personal-account`
 
-The web player renders the same chrome whether or not you are signed in, but the
-signed-in build is the one people actually delegate to, and it is what this map
-describes. Nothing about the account ships. The library grid, the account menu,
-and the playback bar are documented as structure — the map records that they
-exist and what shape they have, never what is in them.
+The web player renders the same chrome signed in or out, but the signed-in build
+is the one people delegate to. The library rail, the account menu and the
+playback bar are documented as structure — the map records that they exist and
+what shape they have, never what is in them.
 
 Only the author can re-verify this entry. `last_verified` means the author
 re-checked with their own account; CI cannot, and neither can a reviewer.
 
-There are no screenshots. Every frame of this view carries the account's library
-down the left rail and its current track along the bottom, and the rule is to
-drop a screenshot rather than retouch one.
-
 ## What bites
 
-**The document title is the playing track, not the page.** Over the course of
-mapping a single album page the title read three different things, none of them
-the album. Anything using `document.title` to confirm a navigation will be wrong
-whenever audio is playing. Read `[data-testid="entityTitle"]` instead.
+**One endpoint serves every view.** `api-partner.spotify.com/pathfinder/v2/query`
+is a POST that fetches album, artist, playlist, search and home alike. The
+operation is named in the request body, so the URL alone never tells you which
+view issued it — request-based view detection does not work here.
 
-**The `main` landmark's `aria-label` is stale.** It holds the previously viewed
-album's name after a client-side navigation, so it disagrees with the page it
-labels.
+**The document title is the playing track, not the page.** Over one mapping
+session it read three different things while the route never changed. Read
+`[data-testid="entityTitle"]` instead.
 
-**Three visible `h1` elements.** They come from the library rail, the album
-header, and the playback bar. A bare `h1` query picks one of the three
-arbitrarily.
+**Album, playlist and artist do not share a shape.** Album and playlist both
+carry `entityTitle` and `action-bar` but sit in different containers,
+`album-page` and `playlist-page`. Artist has **no `entityTitle` at all** — its
+name is a bare `h1`. Test the container, not the header.
 
-**Album artwork is not where it looks.** Neither `cover-art-image` nor
-`entity-image` matches anywhere inside `[data-testid="album-page"]`. All three
-`cover-art-image` nodes belong to the playback widget, so an agent reaching for
-"the album cover" gets the currently playing track's art — wrong content, and
-account state rather than page structure.
+**Search results use none of it.** Every row, whatever its type, is built from
+the generic set `media`, `preTitle`, `title`, `subtitle` and `trailing` — 48 of
+each on one query — so one selector set covers tracks, artists, albums and
+playlists, and none of them says which type a row is.
 
-**The account menu is in the nav rail, not the top bar**, which is the reverse
-of where the layout puts it. The library grid is a root-level sibling of the
-nav, inside neither.
+**The 404 is not the web player.** No `data-testid` anywhere, no `main`, and
+none of the global chrome — no nav rail, no top bar, no playback bar. Every
+global component in this corpus is absent, which is the test that identifies the
+route.
 
-**A hidden language dialog ships on every page**, contributing 74
-`language-option-*` testids that never become visible. Counting testids
-overcounts by that much.
+**Album artwork is not in the album.** Neither `cover-art-image` nor
+`entity-image` matches inside `[data-testid="album-page"]`. All three
+`cover-art-image` nodes belong to the playback widget, so reaching for the album
+cover returns the playing track's art.
+
+**The account menu is in the nav rail, not the top bar**, and the library grid is
+a root-level sibling of the nav, inside neither. Carousel next and previous
+controls are likewise siblings of the scroller rather than children.
+
+**The playlist table is virtualised.** Rows outside the viewport are absent
+rather than hidden, and `tracklist-row-placeholder` marks those still to render,
+so a row count is what is on screen and not the playlist length.
+
+**A hidden language dialog** ships on every page and contributes 74
+`language-option-*` testids, so a testid census overcounts by that much.
 
 ## Coverage
 
-25 components across one view, every selector verified against the live page.
-`sightmap sel-probe` cannot reach a browser the extension drives, so the
-selectors were counted in-page instead; two were mis-scoped on the first pass
-and both are corrected.
+All 51 selectors counted on their declaring route: album 17, playlist 6, artist
+6, home 8, search 5, plus the globals. Three scoping mistakes were caught this
+way and fixed — the library grid, the account menu, and the carousel controls,
+each declared as a child of something it is actually a sibling of.
+
+`sightmap sel-probe` cannot attach to the browser this was authored in, so
+matches were counted in-page instead. No screenshots: the capture tooling
+available here can display an image but cannot write one to disk.
