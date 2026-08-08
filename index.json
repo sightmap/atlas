@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T18:40:16Z",
+  "generated_at": "2026-08-08T19:42:10Z",
   "entries": [
     {
       "slug": "airbnb",
@@ -301,6 +301,100 @@
       "commit": "de495d2949becc39e84a8fcd5f0a83ad407a00da"
     },
     {
+      "slug": "github",
+      "name": "GitHub",
+      "site_url": "https://github.com/",
+      "domains": [
+        "github.com"
+      ],
+      "description": "Public repository hosting — org, repo, file, issue, pull request, and release views, mapped signed-out across two frontends.",
+      "categories": [
+        "devtools",
+        "saas"
+      ],
+      "author": "chiplay",
+      "created": "2026-08-08",
+      "updated": "2026-08-08",
+      "last_verified": "2026-08-08",
+      "cli_version": "0.19.0",
+      "spec_version": 1,
+      "method": "browser",
+      "auth": "none",
+      "stats": {
+        "views": 8,
+        "components": 46,
+        "requests": 23,
+        "properties": 22,
+        "memory": 36
+      },
+      "per_view": [
+        {
+          "name": "PullList",
+          "route": "/:owner/:repo/pulls",
+          "components": 4,
+          "requests": 1
+        },
+        {
+          "name": "IssueList",
+          "route": "/:owner/:repo/issues",
+          "components": 8,
+          "requests": 2
+        },
+        {
+          "name": "Releases",
+          "route": "/:owner/:repo/releases",
+          "components": 1,
+          "requests": 0
+        },
+        {
+          "name": "NotFound",
+          "route": "/**",
+          "components": 2,
+          "requests": 0
+        },
+        {
+          "name": "OrgProfile",
+          "route": "/:org",
+          "components": 6,
+          "requests": 3
+        },
+        {
+          "name": "PullDetail",
+          "route": "/:owner/:repo/pull/:number",
+          "components": 3,
+          "requests": 6
+        },
+        {
+          "name": "RepoHome",
+          "route": "/:owner/:repo",
+          "components": 6,
+          "requests": 6
+        },
+        {
+          "name": "FileBlob",
+          "route": "/:owner/:repo/blob/:ref/**",
+          "components": 4,
+          "requests": 2
+        }
+      ],
+      "screenshots": [
+        "screenshots/01-repo-home.webp",
+        "screenshots/02-file-blob.webp",
+        "screenshots/03-issue-list.webp",
+        "screenshots/04-not-found.webp"
+      ],
+      "files": [
+        ".sightmap/config.yaml",
+        ".sightmap/lists.yaml",
+        ".sightmap/not-found.yaml",
+        ".sightmap/org.yaml",
+        ".sightmap/pull-detail.yaml",
+        ".sightmap/repo.yaml",
+        ".sightmap/shared.yaml"
+      ],
+      "commit": "32cbdb3183c258b703198943630f382567515a86"
+    },
+    {
       "slug": "ikea",
       "name": "IKEA",
       "site_url": "https://www.ikea.com/us/en/",
@@ -591,6 +685,56 @@
         ".sightmap/shared.yaml"
       ],
       "commit": "bcde844d9abf76cb7f8e03117abe765ded9a20fb"
+    },
+    {
+      "slug": "youtube",
+      "name": "YouTube",
+      "site_url": "https://www.youtube.com/",
+      "domains": [
+        "youtube.com",
+        "www.youtube.com"
+      ],
+      "description": "YouTube's home feed and watch page, mapped signed in — feed grid, player, title row, description, comments, and related column.",
+      "categories": [
+        "media"
+      ],
+      "author": "chiplay",
+      "created": "2026-08-08",
+      "updated": "2026-08-08",
+      "last_verified": "2026-08-08",
+      "cli_version": "0.19.0",
+      "spec_version": 1,
+      "method": "browser",
+      "auth": "personal-account",
+      "stats": {
+        "views": 2,
+        "components": 24,
+        "requests": 0,
+        "properties": 3,
+        "memory": 16
+      },
+      "per_view": [
+        {
+          "name": "Home",
+          "route": "/",
+          "components": 5,
+          "requests": 0
+        },
+        {
+          "name": "Watch",
+          "route": "/watch",
+          "components": 13,
+          "requests": 0
+        }
+      ],
+      "screenshots": [],
+      "files": [
+        ".sightmap/config.yaml",
+        ".sightmap/home.yaml",
+        ".sightmap/shared.yaml",
+        ".sightmap/watch.yaml"
+      ],
+      "commit": "8110c7dc52282952b438022c3522fb049afb7605"
     }
   ]
 }
