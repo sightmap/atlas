@@ -92,8 +92,9 @@ for detail it cannot use.
 
 ## Screenshot rules (enforced)
 
-- `screenshots/NN-<kebab-name>.png`, NN starting at `01`; 1–5 images per entry.
-- ≤300 KB each, width 1200–2000 px, PNG or WebP.
+- `screenshots/NN-<kebab-name>.<ext>`, NN starting at `01`; 1–5 images per entry.
+- ≤300 KB each, width 1200–2000 px, PNG, WebP or JPEG (`.png`, `.webp`, `.jpg`, `.jpeg`).
+- The file must decode as the format its extension claims.
 - Public, non-sensitive screens only; no personal data, no real customer records (see POLICY.md). Demo/sandbox data must look like demo data.
 
 ## Signed-in entries (`auth: personal-account`)
