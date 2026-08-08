@@ -1,71 +1,68 @@
 # Handoff — expanding the signed-in entries
 
-State as of 2026-08-08.
+State as of 2026-08-08. All five are done.
 
-## Done
+## Result
 
-`spotify` — [#29](https://github.com/sightmap/atlas/pull/29). One view to six
-(album, playlist, artist, home, search, 404), 25 components to 51, 0 requests
-to 4. Every selector counted on its declaring route. Use it as the pattern.
+| entry | views | components | requests | PR |
+|---|---|---|---|---|
+| spotify | 1 → 6 | 25 → 51 | 0 → 4 | [#29](https://github.com/sightmap/atlas/pull/29) |
+| pinterest | 1 → 6 | 19 → 59 | 6 → 12 | [#32](https://github.com/sightmap/atlas/pull/32) |
+| instacart | 1 → 5 | 10 → 31 | 0 → 8 | [#33](https://github.com/sightmap/atlas/pull/33) |
+| zillow | 1 → 5 | 9 → 59 | 0 → 4 | [#34](https://github.com/sightmap/atlas/pull/34) |
+| youtube | 2 → 6 | 25 → 47 | 0 → 5 | [#35](https://github.com/sightmap/atlas/pull/35) |
 
-## Remaining
+## Four procedures that decide whether this works
 
-`pinterest`, `instacart`, `zillow`, `youtube`. Each has one or two views and
-should have four to six. Worktrees exist at
-`/Users/chip/src/sightmap/.atlas-wt/<slug>` on branches `expand/<slug>`, cut
-from atlas main.
+**Read requests from the page, not from the extension.**
+`performance.getEntriesByType('resource')` sees everything the page fetched.
+`read_network_requests` does not: on Instacart it surfaced two third-party
+beacons while the page had made 62 POSTs to `/graphql`, which is why that entry
+originally shipped with no requests at all. Resource Timing also carries the
+query string, and that is where operation names live —
+`/graphql?operationName=Items` on Instacart, `source_url=<path>` on Pinterest.
 
-Routes worth mapping:
+Extract named fields with a narrow regex rather than returning whole URLs. The
+extension redacts anything that looks base64 or like cookie data, so
+`/operationName=([A-Za-z0-9_]+)/` returns the name while the full URL comes back
+as `[BLOCKED]`.
 
-| entry | has | add |
-|---|---|---|
-| pinterest | pin | board, profile, search, home, 404 |
-| instacart | storefront | aisle, product, search, cart, 404 |
-| zillow | home | search results, listing detail, saved, 404 |
-| youtube | home, watch | channel, search, playlist, 404 |
+**Count every selector on its declaring route, and check the parent too.** Every
+scoping bug in this batch was a component declared as a child of something it is
+a sibling of, and each only surfaced when counted on its own route:
+`board-tools` beside the Pinterest board header rather than inside it; the
+search refinement pills beside the results container; Zillow's price-history
+cells, which are not descendants of `data-price-row` at all. Watch for the
+inverse too — a zero can mean your first `querySelector` picked a parent that
+happens not to contain the child, as with Instacart's `row-base`, where 25 of 28
+rows do hold the checkbox.
 
-## Three procedures that decide whether this works
+**A background tab renders less than you think.** Server-rendered feeds populate
+(Pinterest home and search, YouTube everywhere). Anything fetched afterwards
+does not: Pinterest's profile body stays empty past 13s, a board's grid past
+30s, the related grid on a pin past 19s, and Instacart's storefront never
+resolves at all. The containers render either way, so the page looks loaded and
+has no content. Check `document.hidden` before believing a zero, and compare a
+direct load against arriving by clicking through.
 
-**Arm the network tracker before navigating.** `read_network_requests` starts
-recording on the first call *per tab*. Call it once against the tab, then
-navigate, settle, then read. Reading after a navigation returns almost nothing,
-which is why five entries shipped with zero requests.
-
-**Click through for IDs the extension redacts.** Reading an `href` or
+**Click through for ids the extension redacts.** Reading an `href` or
 `location.pathname` returns `[BLOCKED: Base64 encoded data]` on sites whose ids
-look encoded — Spotify's base62, for instance. `tabs_context` reports the full
-tab URL and is not redacted, so navigate by calling `.click()` on a link and
-read the resulting URL from there.
+look encoded. `tabs_context` reports the full tab URL unredacted, so navigate by
+calling `.click()` on a link and read the resulting URL from there.
 
-**Verify per route, not once.** A selector list checked on one page proves
-nothing about the others. Every scoping bug found in this batch — library grid,
-account menu, carousel controls on spotify; card anchor on zillow; nav icons on
-pinterest — was a component declared as a child of something it is a sibling of,
-and each only showed up when counted on its own route.
+## Screenshots
 
-Related: on a client-rendered site, compare counts at the default settle and at
-`--wait 10` before trusting a zero. Instacart never resolves at all in a
-background tab, and only a real input event (not `window.scrollTo`) advances it.
+Now unblocked on the spec side: `.jpg` and `.jpeg` pass validation alongside
+`.png` and `.webp` ([#31](https://github.com/sightmap/atlas/pull/31)). The
+decoded type still has to match the extension.
 
-## Screenshots — unresolved
+Capture is still manual. The Chrome extension's `computer` screenshot returns an
+image and accepts `save_to_disk: true` but writes nothing reachable on disk, and
+driving Chrome over CDP is out — 136+ ignores `--remote-debugging-port` on a
+default profile and this machine runs 151.
 
-The atlas wants 1–5 per entry, `NN-<kebab>.png|.webp`, width 1200–2000,
-≤300 KB, decoded type matching the extension. `validate-entry.mjs` enforces all
-of it, and `auth: personal-account` entries may ship none.
-
-The blocker: the Chrome extension's `computer` screenshot returns an image and
-accepts `save_to_disk: true`, but writes nothing reachable on disk. A capture
-can be seen and not committed.
-
-Ruled out: driving Chrome over CDP. Chrome 136+ ignores
-`--remote-debugging-port` on a default profile, and this machine runs 151, so it
-would need the whole profile copied to a scratch `--user-data-dir`.
-
-What is left is the maintainer capturing them by hand. Owner is fine with their
-own name, avatar and device names in frame; keep other people's faces, names and
-addresses out — which rules out zillow listing pages and pinterest boards.
-Convert to PNG or WebP before committing, since the validator rejects `.jpg` on
-the filename rule alone.
+None of the five entries ship screenshots. Every one of them is a wall of other
+people's content: pins, listings, feeds, an account's delivery address.
 
 ## Open
 
@@ -74,3 +71,5 @@ the filename rule alone.
 - [sightmap/sightmap#177](https://github.com/sightmap/sightmap/issues/177) —
   `coverage` passes a route pattern where `MatchTree` wants a page URL.
 - `instagram` and `facebook` were closed unmerged. Branches still exist.
+- YAML: a memory note may not begin with a backtick. It is a reserved indicator
+  and the parser rejects the document. Two entries hit this.
