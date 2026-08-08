@@ -2,7 +2,7 @@ version: 1
 
 views:
   - name: SearchResults
-    route: /us/search/:query
+    route: /:locale/search/:query
     url: https://www.apple.com/us/search/macbook
     description: Site search — tabbed results across products, accessories, support, and stores.
     memory:
@@ -18,36 +18,35 @@ views:
         not in a dedicated element.
     components:
       - name: SearchRoot
-        selector: '.rf-serp-search'
-
-      - name: SearchForm
-        selector: '.rf-serp-form'
+        selector: '.as-search-wrapper .rf-serp-search'
         children:
+          - name: SearchForm
+            selector: '.rf-serp-form'
           - name: SearchBox
             selector: '.rf-serp-searchbox'
           - name: SearchAutocomplete
             selector: '.rf-serp-autocomplete'
 
-      - name: ResultTabs
-        selector: '.rf-serp-tab'
-        properties:
-          - name: tabs
-            extract: text
-        memory:
-          - Explore, Accessories, Support, Find a Store. Switching tabs does not
-            change the URL, so the selected tab is not recoverable from the
-            address bar.
+          - name: ResultTabs
+            selector: '.rf-serp-tab'
+            properties:
+              - name: tabs
+                extract: text
+            memory:
+              - Explore, Accessories, Support, Find a Store. Switching tabs does
+                not change the URL, so the selected tab is not recoverable from
+                the address bar.
 
-      - name: ResultPanel
-        selector: '.rf-serp-explore-details'
-        properties:
-          - name: results_text
-            extract: text
-        memory:
-          - Holds the count and the result list for the active tab only.
+          - name: ResultPanel
+            selector: '.rf-serp-explore-details'
+            properties:
+              - name: results_text
+                extract: text
+            memory:
+              - Holds the count and the result list for the active tab only.
 
-      - name: TabNavContainer
-        selector: '.rf-serp-tabnav-container'
+          - name: TabNavContainer
+            selector: '.rf-serp-tabnav-container'
 
     requests:
       - name: StoreSearchService

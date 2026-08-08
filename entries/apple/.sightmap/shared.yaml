@@ -84,7 +84,7 @@ components:
         on roughly half the site.
     children:
       - name: FooterDisclosure
-        selector: '.as-globalfooter-sosumi'
+        selector: '.ac-gf-sosumi, .as-globalfooter-sosumi'
         properties:
           - name: disclosure
             extract: text
@@ -99,7 +99,7 @@ components:
         memory:
           - Breadcrumbs live in the footer on this site, not above the content.
       - name: FooterDirectory
-        selector: 'nav[aria-label="More Apple Store Links"]'
+        selector: 'nav[aria-label="Apple Directory"], nav[aria-label="More Apple Store Links"]'
 
 requests:
   - name: GlobalHeaderFlyouts

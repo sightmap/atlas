@@ -2,7 +2,7 @@ version: 1
 
 views:
   - name: BuyFlow
-    route: /shop/buy-mac/:model
+    route: /**/shop/buy-mac/:model
     url: https://www.apple.com/shop/buy-mac/macbook-air
     description: Configure-and-buy page — stepped option selection with a running price in a sticky bar.
     memory:
@@ -73,7 +73,7 @@ views:
               - Inline help offering a comparison when a step is ambiguous.
 
       - name: CustomizableSpecs
-        selector: '#customizableSpecs'
+        selector: '.rs-mac-bfe-collapsible-config-section'
         properties:
           - name: specs_text
             extract: text

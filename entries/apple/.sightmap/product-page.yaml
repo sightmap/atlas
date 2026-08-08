@@ -32,7 +32,7 @@ views:
             pages only.
 
       - name: MainContent
-        selector: '#main'
+        selector: '[role="main"]'
 
       - name: PromoRibbon
         selector: '.ribbon'
