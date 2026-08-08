@@ -29,14 +29,15 @@ views:
           - The department tree for the charts. Its entries are links, so the
             whole taxonomy can be walked without clicking.
 
-      - name: CardWidget
-        selector: '.celwidget'
+      - name: ChartSection
+        selector: '[data-cel-widget^="p13n-zg-list-carousel-desktop"]'
         properties:
-          - name: widget_text
+          - name: section_text
             extract: text
         memory:
-          - Amazon's generic content-widget wrapper, used across several
-            surfaces. Here it wraps each chart section.
+          - The chart carousels. Do not reach for `.celwidget` here — it is a
+            generic wrapper that also matches the navbar, the banners, and the
+            department tree.
 
     requests:
       - name: ComponentBuilder

@@ -57,14 +57,14 @@ views:
               - name: rating
                 extract: text
           - name: CorePrice
-            selector: '#corePrice_feature_div'
+            selector: '#apex_desktop'
             properties:
               - name: price
                 extract: text
             memory:
-              - The price shown in the center column. The buy box carries its own
-                copy, and on articles with multiple offers the two can differ,
-                since the buy box reflects the selected offer.
+              - The center-column price is `#apex_desktop`. The id that reads like
+                the price slot, `#corePrice_feature_div`, is not here — it is the
+                buy box's per-offer price and matches three times.
 
       - name: BuyBox
         selector: '#buybox'
