@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T19:42:10Z",
+  "generated_at": "2026-08-08T19:49:09Z",
   "entries": [
     {
       "slug": "airbnb",
@@ -468,6 +468,49 @@
       "commit": "037365d2b91cdd707161ae77c61c68e70e3bb4de"
     },
     {
+      "slug": "instacart",
+      "name": "Instacart",
+      "site_url": "https://www.instacart.com/",
+      "domains": [
+        "instacart.com",
+        "www.instacart.com"
+      ],
+      "description": "Instacart's retailer storefront, mapped signed in — aisle rail, item cards, cart entry, and the skeletons that never resolve.",
+      "categories": [
+        "commerce"
+      ],
+      "author": "chiplay",
+      "created": "2026-08-08",
+      "updated": "2026-08-08",
+      "last_verified": "2026-08-08",
+      "cli_version": "0.19.0",
+      "spec_version": 1,
+      "method": "browser",
+      "auth": "personal-account",
+      "stats": {
+        "views": 1,
+        "components": 10,
+        "requests": 0,
+        "properties": 3,
+        "memory": 8
+      },
+      "per_view": [
+        {
+          "name": "Storefront",
+          "route": "/store/:retailerSlug/storefront",
+          "components": 4,
+          "requests": 0
+        }
+      ],
+      "screenshots": [],
+      "files": [
+        ".sightmap/config.yaml",
+        ".sightmap/shared.yaml",
+        ".sightmap/storefront.yaml"
+      ],
+      "commit": "21d4ae87003f24100d3395703d970851503542aa"
+    },
+    {
       "slug": "nike",
       "name": "Nike",
       "site_url": "https://www.nike.com/",
@@ -539,6 +582,49 @@
         ".sightmap/wall.yaml"
       ],
       "commit": "86d4aff271edde12fd4d844e0b160ac17ac9da20"
+    },
+    {
+      "slug": "pinterest",
+      "name": "Pinterest",
+      "site_url": "https://www.pinterest.com/",
+      "domains": [
+        "pinterest.com",
+        "www.pinterest.com"
+      ],
+      "description": "Pinterest's pin detail page, mapped signed in — closeup image, description, action bar, and the related-pin grid.",
+      "categories": [
+        "social"
+      ],
+      "author": "chiplay",
+      "created": "2026-08-08",
+      "updated": "2026-08-08",
+      "last_verified": "2026-08-08",
+      "cli_version": "0.19.0",
+      "spec_version": 1,
+      "method": "browser",
+      "auth": "personal-account",
+      "stats": {
+        "views": 1,
+        "components": 18,
+        "requests": 6,
+        "properties": 3,
+        "memory": 10
+      },
+      "per_view": [
+        {
+          "name": "PinDetail",
+          "route": "/pin/:pinId",
+          "components": 13,
+          "requests": 1
+        }
+      ],
+      "screenshots": [],
+      "files": [
+        ".sightmap/config.yaml",
+        ".sightmap/pin.yaml",
+        ".sightmap/shared.yaml"
+      ],
+      "commit": "84409442e496621ce0aac1b2e51b16cbb48355bb"
     },
     {
       "slug": "uniqlo",
