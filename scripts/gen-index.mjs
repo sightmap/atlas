@@ -8,12 +8,12 @@
 //   - parses the README.md front matter (metadata source of truth),
 //   - shells `sightmap stats --json` for `stats` + `per_view` — NEVER
 //     hand-computes them. REQUIRES a sightmap build with the `stats` verb
-//     (sightmap/sightmap PR #167, branch feat/stats-verb). If the verb is
-//     missing the script fails with a clear message; pass
-//     --allow-missing-stats to emit the index without `stats`/`per_view`
-//     (local dry runs only — CI must always produce full stats),
+//     (v0.19.0 or later). If the verb is missing the script fails with a
+//     clear message; pass --allow-missing-stats to emit the index without
+//     `stats`/`per_view` (local dry runs only — CI must always produce
+//     full stats),
 //   - lists files[] from a .sightmap/** walk (paths relative to the entry
-//     dir, `.sightmap/`-prefixed — `sightmap add` fetches exactly these),
+//     dir, `.sightmap/`-prefixed — the manifest of the published corpus),
 //   - lists screenshots[] from screenshots/,
 //   - records commit = `git log -1 --format=%H -- <entry>` (null with a
 //     warning when the entry has no committed history yet).
@@ -75,8 +75,8 @@ function statsFor(sightmapDir, entryLabel) {
   if (isUnknownVerb(res, "stats")) {
     const msg =
       `the sightmap CLI (${sightmapCommandDescription()}) has no \`stats\` verb. ` +
-      "gen-index requires sightmap/sightmap PR #167 (branch feat/stats-verb); " +
-      "until it merges, point $SIGHTMAP_BIN at a binary built from that branch.";
+      "gen-index requires sightmap v0.19.0 or later; " +
+      "point $SIGHTMAP_BIN at a current build or bump the pinned ref.";
     if (!allowMissingStats) fail(msg);
     console.error(`gen-index: warning: ${msg}`);
     console.error(`gen-index: warning: emitting ${entryLabel} without stats/per_view`);
