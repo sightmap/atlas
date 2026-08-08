@@ -8,17 +8,10 @@ views:
     memory:
       - Built by the same CMS renderer as the 404. Both mount `#ciclp-app`, so
         that id identifies the renderer rather than the page.
-      - Almost every hook here is compiled output (`._2tSHtrc2`, `.WetubkUi`,
-        `.l01-Jx1P`), which changes between deploys. The durable handles are the
-        design-system classes (`.nds-carousel`, `.nds-text`, `.image-card`) and
-        the `aria-label` on each campaign link.
-      - Campaign links are anchors whose entire content is an image, so they have
-        no text. `aria-label` ("BEST IN CLASS", "GAME RECOGNIZE GAME", "Jordan
-        Logo") is the only readable identity, and the labels change with the
-        campaign.
+      - Durable handles here are the design-system classes and the `aria-label`
+        on each campaign link. Everything else is compiled output.
       - There is no product grid and no search field in the page body. The first
-        surface that lists products is `/w`, so an agent looking for items should
-        go straight there.
+        surface that lists products is `/w`.
     components:
       - name: HomeApp
         selector: '#ciclp-app'
@@ -29,13 +22,11 @@ views:
           - name: card_text
             extract: text
         memory:
-          - Full-bleed editorial tiles. Which ones render, and in what order, is
-            merchandising.
+          - Which tiles render, and in what order, is merchandising — neither is
+            stable across loads.
 
       - name: HomeCarousel
         selector: '#ciclp-app .nds-carousel'
-        memory:
-          - The same design-system carousel used on the product page and the 404.
 
       - name: CampaignLink
         selector: '#ciclp-app a[aria-label]'
@@ -43,9 +34,8 @@ views:
           - name: label
             extract: attr=aria-label
         memory:
-          - Matches the labelled links in the nav and footer as well as the
-            campaign tiles, because the page body offers nothing more specific to
-            anchor to.
+          - Campaign links wrap an image and carry no text. `aria-label` is the
+            only readable identity and it changes with the campaign.
 
     requests:
       - name: VideoManifest
@@ -54,5 +44,4 @@ views:
         description: Playback manifest for a hero video, on api.nike.com. Only the home page carries video, and the segments then stream from assets.nmp.nike.com.
         memory:
           - Once playback starts the segment requests arrive several per second
-            and never stop, so a capture left running on this route fills with
-            them and buries everything else.
+            and never stop, so a capture left running here fills with them.

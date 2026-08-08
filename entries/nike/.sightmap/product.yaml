@@ -6,26 +6,16 @@ views:
     url: https://www.nike.com/t/pegasus-premium-mens-road-running-shoes-kWXqW9yR/IV5663-012
     description: Product page — image carousel, price, size grid, and the add-to-bag control.
     memory:
-      - A discontinued product does not 404. The URL returns 200, renders
-        `pdp-main`, and shows the sentence "THE PRODUCT YOU ARE LOOKING FOR IS NO
-        LONGER AVAILABLE" above a recommendations carousel. Structural checks
-        cannot tell that page apart from a live product; look for
-        `#pdp_product_title` and a size grid, both of which are absent when the
-        product is gone.
-      - The style code ending the URL (`IV5663-012`) is the colorway, not the
-        product. A different colorway of the same shoe is a different URL with
-        the same slug, which is why the slug alone is not addressable.
-      - Every identifier this page's API calls need is already in its URL, in
-        three forms. From `/t/pegasus-premium-mens-road-running-shoes-kWXqW9yR/IV5663-012`
-        the trailing token on the slug (`kWXqW9yR`) is the group key that keys
-        the availability call; the last segment (`IV5663-012`) is the style
-        colour that keys promotion visibility; and that segment with the
-        colorway suffix dropped (`IV5663`) is the style code that keys the
-        product record and the FAQ file. An agent holding the URL can address
-        all four without scraping anything.
-      - Testid casing switches mid-page. `pdp-main` and `atb-button` are
-        kebab-case while `ImageCarousel`, `ThumbnailListContainer`, and
-        `Thumbnail-0` are PascalCase.
+      - A discontinued product returns 200 and still renders `pdp-main` above a
+        recommendations carousel. Check for `#pdp_product_title` and a size grid
+        — both are absent when the product is gone.
+      - The trailing style code is the colorway, not the product. Each colorway
+        is its own URL under the same slug, so the slug alone is not addressable.
+      - Every id this page's API calls need is already in the URL. The token
+        after the last dash of the slug is the group key for availability, the
+        final segment is the style colour for promotion visibility, and that
+        segment minus its numeric suffix is the style code for the product record
+        and the FAQ file.
     components:
       - name: ProductMain
         selector: '[data-testid="pdp-main"]'
@@ -35,9 +25,6 @@ views:
         properties:
           - name: title
             extract: text
-        memory:
-          - Absent when the product is discontinued, which makes it the most
-            reliable liveness check on this route.
 
       - name: CurrentPrice
         selector: '[data-testid="currentPrice-container"]'
@@ -45,8 +32,8 @@ views:
           - name: price
             extract: text
         memory:
-          - Matches more than once on a discounted product, since the page
-            renders the price in several places.
+          - Matches more than once inside the product body and one match is
+            empty, so read the first non-empty one.
 
       - name: SizeGrid
         selector: '[data-testid="pdp-grid-selector-item"]'
@@ -54,26 +41,23 @@ views:
           - name: size_label
             extract: text
         memory:
-          - One element per size. Sold-out sizes stay in the grid rather than
-            being removed, so presence is not availability.
+          - Sold-out sizes stay in the grid rather than being removed, and
+            nothing marks them until ProductAvailability resolves. Presence is
+            not availability.
 
       - name: AddToBagButton
         selector: '[data-testid="atb-button"]'
-        memory:
-          - Labelled "Add to Bag". The abbreviation in the testid is the only
-            place the site calls it that.
 
       - name: FavoriteButton
         selector: '[data-testid="pdp-main"] [data-testid="favorite-button"]'
         memory:
-          - The bare testid also matches the Favorites link in the global nav, so
-            it has to be scoped to the product body.
+          - The bare testid also matches the Favorites link in the global nav,
+            which is why this one is scoped to the product body.
 
       - name: PromoBanner
         selector: '[data-testid="banner-carousel"]'
         memory:
-          - A rotating promotional strip at the top of the content area. Its text
-            changes on a timer, so an assertion against it is a race.
+          - Its text rotates on a timer, so any assertion against it is a race.
 
       - name: ImageCarousel
         selector: '[data-testid="ImageCarousel"]'
@@ -86,8 +70,9 @@ views:
               - name: thumb_id
                 extract: attr=data-testid
             memory:
-              - Numbered per position (`Thumbnail-0`, `Thumbnail-Img-0`), so the
-                prefix match picks up both the button and its image.
+              - The prefix match picks up both the button and its image
+                (`Thumbnail-0` and `Thumbnail-Img-0`), so the match count is
+                twice the thumbnail count.
 
       - name: ProductDescription
         selector: '[data-testid="product-description"]'
@@ -102,9 +87,6 @@ views:
 
       - name: RecommendationsCarousel
         selector: '[data-testid="recommendations-carousel"]'
-        memory:
-          - Also the main content of a discontinued product page, where it sits
-            directly under the unavailable notice.
 
     requests:
       - name: ProductExperience

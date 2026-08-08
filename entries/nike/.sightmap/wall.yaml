@@ -6,24 +6,18 @@ views:
     url: https://www.nike.com/w?q=running%20shoes
     description: Keyword search — the product wall with its filter rail and result grid.
     memory:
-      - Search and category browse are one page. `/w?q=<terms>` searches;
-        `/w/<categorySlug>` browses a category. Both render `#Wall`, the same
-        `.product-card` grid, and the same `.ln-scroller` filter rail, so a
-        single set of selectors drives both and the only difference is the URL.
-      - The result count lives in `.wall-header__title` as part of a sentence
-        ("Search results for running shoes (429)"), so it has to be parsed out of
-        the heading rather than read from a dedicated element.
-      - The grid renders 24 cards and appends on scroll. A count taken on load
-        measures the first page, not the 429 in the heading.
-      - The `.loader-overlay` element sits inside `.product-grid` permanently and
-        covers the grid only while a filter is being applied. Its presence is not
-        a loading signal; its visibility is.
+      - A query that matches a known category redirects to `/w/<categorySlug>`
+        and the heading becomes the category name, so read `location.href` after
+        the load rather than assuming the search URL held.
+      - There is no dedicated result-count element. The total sits in parentheses
+        inside the `.wall-header__title` sentence and has to be parsed out.
+      - The grid renders 24 cards and appends on scroll, so a count taken on load
+        measures the first page, not the total in the heading.
+      - The loader overlay is a permanent child of `.product-grid`, not one
+        mounted on demand. Presence is not a loading signal; visibility is.
     components:
       - name: BrowseShell
         selector: '[data-test="browseShell"]'
-        memory:
-          - One of the few `data-test` hooks on the site. Everything else nearby
-            uses `data-testid`.
 
       - name: Wall
         selector: '#Wall'
@@ -57,20 +51,14 @@ views:
           - name: is_premium
             extract: attr=data-is-premium
         memory:
-          - Also matches `[data-testid="product-card"]`; the two are the same
-            element and either works.
-          - The `data-product-position` attribute is the card's rank in the
-            current result set, which is the cheapest way to preserve result
-            order without tracking DOM index.
+          - Card position is its rank in the whole result set, not its index
+            among the 24 rendered.
         children:
           - name: CardLink
             selector: '.product-card__link-overlay'
             properties:
               - name: product_url
                 extract: attr=href
-            memory:
-              - An overlay anchor covering the whole card, so the destination is
-                readable without descending into the title.
           - name: CardTitle
             selector: '.product-card__title'
             properties:
@@ -82,9 +70,8 @@ views:
               - name: price
                 extract: text
             memory:
-              - Discounted cards carry two of these, the current and the original
-                price, which is why the page has one more price element than it
-                has cards.
+              - Discounted cards carry two price elements, current and original,
+                so the price count runs ahead of the card count.
           - name: CardImage
             selector: '.product-card__hero-image'
 
@@ -94,11 +81,8 @@ views:
         method: GET
         description: The grid contents on api.nike.com, for everything past the first paint — refining, sorting, and paging further in.
         memory:
-          - This is not how the first screen of results arrives. The document
-            already carries all 24 cards; a fetch of the URL with no JavaScript
-            running contains every one of them. The endpoint takes over only
-            once the query changes or the served page runs out.
-          - Category browse issues the identical call. The two views differ in
-            how they ask — search passes the query, category passes the taxonomy
-            filter — but the endpoint and the response shape are the same, so
-            anything written against one works on the other.
+          - The first 24 results are already in the served HTML, so a plain fetch
+            with no JavaScript gets them. This endpoint takes over only once the
+            query changes or the served page runs out.
+          - Category browse calls the same endpoint with a taxonomy filter
+            instead of a query, and the response shape is identical.

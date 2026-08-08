@@ -6,14 +6,8 @@ views:
     url: https://www.nike.com/w/mens-running-shoes-37v7jznik1zy7ok
     description: Category browse — the same product wall as search, addressed by a category slug.
     memory:
-      - Structurally identical to `SearchResults`. The distinction is the URL
-        shape, not the page, so an agent that handles one handles the other.
-      - The slug ends in an opaque taxonomy code (`37v7jznik1zy7ok`) that
-        concatenates one or more facet ids. It cannot be constructed from a
-        category name; follow a link from the shopping menu instead.
-      - Every entry in the global nav's shopping menu points at one of these, so
-        the full top-level taxonomy is enumerable from the header without opening
-        a flyout.
+      - The slug ends in an opaque taxonomy code that cannot be constructed from
+        a category name. Follow a link from the shopping menu instead.
     components:
       - name: BrowseShell
         selector: '[data-test="browseShell"]'
