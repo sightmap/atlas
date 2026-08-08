@@ -7,7 +7,7 @@ description: US storefront — search, category browse, product detail, and the 
 categories: [commerce]
 author: chiplay
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-08-08
 last_verified: 2026-08-06
 cli_version: 0.18.0
 spec_version: 1
@@ -39,7 +39,7 @@ deliberately (see Known gaps), and the remaining top-level paths (`/rooms/`,
 `hnf-` frame and the same CMS modules the home page uses, so mapping them would
 repeat `Home` under different names rather than describe new structure.
 
-## What bites
+## Hazards
 
 **Learn the four class prefixes and most selector guessing disappears.** `hnf-`
 is the shared header, nav, and footer frame. `plp-` is the product list, and it
