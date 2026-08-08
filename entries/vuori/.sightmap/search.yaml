@@ -6,13 +6,10 @@ views:
     url: https://vuoriclothing.com/search?q=shorts
     description: Search results — the same filter bar and product grid the collection pages use.
     memory:
-      - Reachable by URL alone as `/search?q=<terms>`, with no need to open the
-        header search control.
-      - Structurally the same page as a collection. The filter bar, product row,
-        and card are the identical components, so one set of selectors covers
-        both surfaces.
-      - Search is Algolia-backed, which is where the `queryId` on outgoing
-        product links comes from.
+      - The product row wrapper is the one component that differs from a
+        collection page. It is `SearchPage-ConnectedProductRow` here and
+        `Plp-ConnectedProductRow` there; the collection name matches nothing on
+        this view.
     components:
       - name: FilterBar
         selector: '[data-testid="filter-bar"]'
