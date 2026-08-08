@@ -1,0 +1,33 @@
+version: 1
+
+views:
+  - name: Checkout
+    route: /checkout
+    components:
+      - name: CartSummary
+        selector: '[data-component="CartSummary"]'
+        properties:
+          - name: total
+            extract: text
+            transform: first_dollar
+
+      - name: PaymentForm
+        selector: '[data-component="PaymentForm"]'
+        memory:
+          - Card number field masks all but last 4 on blur
+          - Submit is disabled until all required fields pass validation
+        properties:
+          - name: heading
+            extract: h2
+        children:
+          - name: CardNumber
+            selector: 'input[name="card"]'
+          - name: SubmitButton
+            selector: 'button[type="submit"]'
+
+    requests:
+      - name: PlaceOrder
+        route: /api/orders
+        method: POST
+        memory:
+          - Idempotency-Key header is required; duplicates are rejected with 409

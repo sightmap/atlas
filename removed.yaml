@@ -1,0 +1,9 @@
+# Tombstones for removed entries. Slugs listed here may NEVER be reused
+# (docs/SPEC.md "removed.yaml"). Each item has the shape:
+#
+#   - slug: acme-pos               # the removed entry's slug
+#     removed: 2026-09-01          # date the entry was removed (YYYY-MM-DD)
+#     reason: owner-request        # owner-request | policy | superseded-by:<slug>
+#
+# The file is a YAML list; it starts out empty.
+[]

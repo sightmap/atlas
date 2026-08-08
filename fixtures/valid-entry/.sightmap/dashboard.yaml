@@ -1,0 +1,22 @@
+version: 1
+
+views:
+  - name: Dashboard
+    route: /dashboard
+    components:
+      - name: DashboardLayout
+        selector: '[data-component="DashboardLayout"]'
+        children:
+          - name: Sidebar
+            selector: '[data-slot="sidebar"]'
+          - name: Main
+            selector: '[data-slot="main"]'
+
+      - name: ActivityFeed
+        selector: '[data-component="ActivityFeed"]'
+        properties:
+          - name: latest
+            extract: 'li:first-child'
+        memory:
+          - Paginated 20 at a time; scroll to bottom to load more
+          - Empty state hides the header entirely

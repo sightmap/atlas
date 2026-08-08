@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/sightmap/atlas/main/schema/entry.schema.json",
+  "title": "Atlas entry front matter",
+  "description": "Front matter of entries/<slug>/README.md, per docs/SPEC.md. CI validates every entry against this schema.",
+  "type": "object",
+  "required": [
+    "name",
+    "slug",
+    "site_url",
+    "domains",
+    "description",
+    "categories",
+    "author",
+    "created",
+    "updated",
+    "last_verified",
+    "cli_version",
+    "spec_version",
+    "method",
+    "auth"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50,
+      "description": "Display name of the mapped product."
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]{1,63}$",
+      "description": "Kebab-case product slug; must equal the entry folder name and be unique against entries/ and removed.yaml."
+    },
+    "site_url": {
+      "type": "string",
+      "pattern": "^https?://[^\\s]+$",
+      "maxLength": 2000,
+      "description": "Canonical URL of the mapped product surface."
+    },
+    "domains": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,}$",
+        "description": "A bare domain name (no scheme, no path), e.g. squareup.com."
+      },
+      "description": "1-5 domains the map covers."
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 140,
+      "description": "One-sentence description of what the map covers."
+    },
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "commerce",
+          "pos",
+          "saas",
+          "devtools",
+          "docs",
+          "finance",
+          "travel",
+          "media",
+          "social",
+          "government",
+          "education",
+          "other"
+        ]
+      },
+      "description": "1-3 categories from the closed enum in docs/SPEC.md."
+    },
+    "author": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0,38}$",
+      "description": "GitHub handle of the mapper."
+    },
+    "created": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Date the entry was first added (YYYY-MM-DD)."
+    },
+    "updated": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Date of the last content change (YYYY-MM-DD); bump on any content change."
+    },
+    "last_verified": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Last date selectors were probed against the live site (YYYY-MM-DD)."
+    },
+    "cli_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$",
+      "description": "sightmap CLI version used to author the entry."
+    },
+    "spec_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "sightmap spec version; must match .sightmap/config.yaml version."
+    },
+    "method": {
+      "enum": ["browser", "hybrid"],
+      "description": "How the map was authored."
+    },
+    "auth": {
+      "enum": ["none", "demo-account", "self-hosted"],
+      "description": "Access model of the mapped surfaces (see docs/POLICY.md)."
+    }
+  }
+}
