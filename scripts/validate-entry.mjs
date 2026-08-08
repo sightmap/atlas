@@ -7,6 +7,8 @@
 // run reports every distinct problem):
 //
 //   front-matter        README.md exists and its front matter parses as YAML
+//   layout              the entry dir holds only what docs/SPEC.md names:
+//                       README.md, .sightmap/, screenshots/
 //   schema              front matter validates against schema/entry.schema.json
 //   slug-matches-folder front-matter slug == entry folder name
 //   slug-unique         slug collides with no other entries/<slug> and no
@@ -63,6 +65,23 @@ function check(name, ok, detail = "") {
 const fmResult = parseFrontMatter(join(entryDir, "README.md"));
 const fm = fmResult.data ?? null;
 check("front-matter", !fmResult.error, fmResult.error ?? "README.md front matter parsed");
+
+// ── layout ───────────────────────────────────────────────────────────────────
+// docs/SPEC.md's directory layout is closed: anything else in the entry dir is
+// something `sightmap atlas add` will never install and a reviewer should not
+// have to read (the seed batch shipped seven stray mapping reports this way).
+
+{
+  const allowed = new Set(["README.md", ".sightmap", "screenshots"]);
+  const strays = readdirSync(entryDir).filter((name) => !allowed.has(name));
+  check(
+    "layout",
+    strays.length === 0,
+    strays.length === 0
+      ? "entry holds only README.md, .sightmap/, screenshots/"
+      : `unexpected file(s) in the entry dir: ${strays.join(", ")} — docs/SPEC.md names only README.md, .sightmap/, screenshots/`,
+  );
+}
 
 // ── schema ───────────────────────────────────────────────────────────────────
 

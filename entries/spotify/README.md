@@ -70,3 +70,6 @@ overcounts by that much.
 `sightmap sel-probe` cannot reach a browser the extension drives, so the
 selectors were counted in-page instead; two were mis-scoped on the first pass
 and both are corrected.
+
+The corpus records no network requests — the requests dimension is a known gap
+of this entry, not a claim that the web player makes no calls.

@@ -2,7 +2,7 @@
 name: Pinterest
 slug: pinterest
 site_url: https://www.pinterest.com/
-domains: [pinterest.com, www.pinterest.com]
+domains: [pinterest.com]
 description: Pinterest's pin detail page, mapped signed in — closeup image, description, action bar, and the related-pin grid.
 categories: [social]
 author: chiplay
@@ -17,7 +17,7 @@ auth: personal-account
 
 # Pinterest
 
-One view: a pin detail page. 19 components and 6 requests, every selector
+One view: a pin detail page. 18 components and 6 requests, every selector
 counted against the live page.
 
 ## Why this is `auth: personal-account`
@@ -50,11 +50,11 @@ before reading the pin waits for something that will not arrive.
 **There is an explicit settle marker.** `[data-test-id="closeup-data-loaded"]`
 appears once the pin has rendered. Poll for it rather than guessing a delay.
 
-**Related cards are not uniform.** Of 22 observed, 21 carried an image, two were
-video, and only 17 had a footer or a more-actions button. Counts across the grid
-do not line up with the card count.
+**Related cards are not uniform.** Some carry a video where the image would be,
+and the footer and more-actions button appear on only some cards. Counts across
+the grid do not line up with the card count.
 
-**44 images carry `pin-missing-alt-text`**, so alt text is not a dependable
+**Most images carry `pin-missing-alt-text`**, so alt text is not a dependable
 description source on this page.
 
 **Every backend call is `/resource/:ResourceName/:verb/`** where the verb is
