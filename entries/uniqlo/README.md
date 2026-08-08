@@ -3,11 +3,11 @@ name: UNIQLO
 slug: uniqlo
 site_url: https://www.uniqlo.com/us/en/
 domains: [uniqlo.com]
-description: US storefront — category listings, product pages, search, and the only error page in this atlas with a real address.
+description: US storefront — category listings, product pages, search, and an error page with a real address.
 categories: [commerce]
 author: chiplay
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 last_verified: 2026-08-07
 cli_version: 0.18.0
 spec_version: 1
@@ -35,26 +35,22 @@ The US storefront (`/us/en/`), mapped as a signed-out shopper.
 `GlobalFooter` are global. All five views report `0 orphaned` coverage, with
 every selector `sel-probe`d on 2026-08-07.
 
-## What's good here
+## Reliable signals
 
 **The page type is a class on the content root.** `.fr-ec-template-plp` is a
 category listing, `.fr-ec-template-pdp` is a product page, `.home-template` is
-the landing page. No other site in this atlas announces what kind of page it is;
-an agent can branch on this instead of parsing a URL.
+the landing page. An agent can branch on this instead of parsing a URL.
 
 **The error page has a real address.** An unmatched path redirects to
 `/us/en/not-found`, so `location.pathname` answers "did I land on an error page"
-with no DOM inspection. Every other site mapped here keeps the requested path and
-makes you look at the page.
+with no DOM inspection.
 
-## What bites
+## Hazards
 
 **The `data-testid` values are design-system primitives, not identifiers.**
 `ITOTypography` matched 574 elements on one page, `ITOImage` 363, `ITOLink` 128.
 They tell you an element is *a* piece of text and never *which* one. Use the
-`fr-ec-` classes for identity and read `ITO*` as type information. This is the
-mirror image of the problem in the Vuori entry, where testids are so specific
-they encode product names — neither extreme is usable as a hook.
+`fr-ec-` classes for identity and read `ITO*` as type information.
 
 **The landing page has three addresses and state decides which you get.**
 `/us/en/` redirects to whichever gender was browsed last, `/us/en/men` keeps its
