@@ -8,7 +8,8 @@
 #      (GitHub natively skips workflows for that trailer, so this cannot
 #      retrigger itself; the `publish` concurrency group serializes runs
 #      from rapid merges),
-#   3. vendor index.json + all entry screenshots into sightmap/sightmap as
+#   3. vendor index.json + every entry's screenshots, corpus and README into
+#      sightmap/sightmap as
 #      ONE rolling PR (branch atlas-vendoring, force-pushed). sightmap.org's
 #      build stays fully local — atlas data reaches it only via this PR,
 #      never a network fetch at build time. The PR is NEVER auto-merged.
@@ -156,6 +157,29 @@ jobs:
             cp "${shots[@]}" "web/src/data/atlas/screenshots/${slug}/"
           done
 
+          # Corpora → web/src/data/atlas/<slug>/.sightmap/… and READMEs →
+          # web/src/data/atlas/<slug>.md. build-atlas.ts reads both: the corpus
+          # becomes the <slug>.tar.gz that `sightmap atlas add` fetches, and the
+          # README becomes the detail page body and its machine twin. Without
+          # them the gallery still renders from index.json, but every install
+          # 404s and every detail page is bodyless.
+          #
+          # Wiped and recreated for the same reason the screenshots are: a
+          # removed entry has to lose its corpus here too, or it stays
+          # installable after being taken down.
+          find web/src/data/atlas -mindepth 1 -maxdepth 1 -type d \
+            ! -name screenshots -exec rm -rf {} +
+          rm -f web/src/data/atlas/*.md
+          for dir in ../entries/*/; do
+            slug="$(basename "$dir")"
+            [ -d "${dir}.sightmap" ] || continue
+            mkdir -p "web/src/data/atlas/${slug}/.sightmap"
+            cp -R "${dir}.sightmap/." "web/src/data/atlas/${slug}/.sightmap/"
+            if [ -f "${dir}README.md" ]; then
+              cp "${dir}README.md" "web/src/data/atlas/${slug}.md"
+            fi
+          done
+
           git add web/src/data/atlas
           if git diff --cached --quiet; then
             echo "vendored atlas data is already up to date; nothing to push"
@@ -165,7 +189,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898062+github-actions[bot]@users.noreply.github.com"
           git commit \
-            -m "Vendor atlas index.json and screenshots" \
+            -m "Vendor atlas index.json, screenshots, corpora and READMEs" \
             -m "Automated rolling update from the sightmap/atlas publish workflow (atlas commit ${atlas_sha}). Do not auto-merge."
           git push --force origin atlas-vendoring
 
