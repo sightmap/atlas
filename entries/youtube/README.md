@@ -3,7 +3,7 @@ name: YouTube
 slug: youtube
 site_url: https://www.youtube.com/
 domains: [youtube.com, www.youtube.com]
-description: YouTube's home feed and watch page, mapped signed in — feed grid, player, title row, description, comments, and related column.
+description: YouTube mapped signed in — home, watch, search, channel, playlist and the 404, and the attribute that tells three of them apart.
 categories: [media]
 author: chiplay
 created: 2026-08-08
@@ -17,8 +17,8 @@ auth: personal-account
 
 # YouTube
 
-Two views: the signed-in home feed and a watch page. 25 components, every
-selector counted against the live page on the route that declares it.
+Six views: home, watch, search results, a channel, a playlist, and the 404. 47
+components and 5 requests, every selector counted on the route that declares it.
 
 ## Why this is `auth: personal-account`
 
@@ -36,46 +36,66 @@ account's feed, and the rule is to drop the frame rather than retouch it.
 
 ## What bites
 
+**Three routes share one element.** Home, channel and playlist are all
+`ytd-browse`. Only its `page-subtype` attribute — `home`, `channels`,
+`playlist` — separates them. Search is the exception that uses its own renderer,
+`ytd-search`.
+
 **The search field is a `textarea`, not an `input`.** It is
 `textarea[role="combobox"]` inside `form[action="/results"]`. The selector
-everyone reaches for — `input[name="search_query"]` — matches nothing. There
-are only two `<input>` elements on the whole home page, both hidden checkboxes.
+everyone reaches for, `input[name="search_query"]`, matches nothing. There are
+only two `<input>` elements on the whole home page, both hidden checkboxes.
+
+**Video rows use two renderers at once.** Search results carry both
+`ytd-video-renderer` and `yt-lockup-view-model` on the same page, so counting
+either alone undercounts. On a playlist the legacy
+`ytd-playlist-video-renderer` matches nothing at all — the rows are
+`yt-lockup-view-model`, the same element home and search use — so an old
+playlist selector silently returns an empty list.
+
+**Subscribe is two different elements.** A channel page uses
+`yt-subscribe-button-view-model`; a watch page uses
+`ytd-subscribe-button-renderer`. Neither matches on the other route.
 
 **Ids are not unique.** `#content` matched 46 elements on home and 12 on a watch
-page. `getElementById` returns an arbitrary one of them. Select by element name
-instead.
-
-**The icon sprite owns generic ids.** `#add`, `#alarm`, `#accessibility` and
-dozens more resolve to invisible sprite symbols rather than controls.
+page. `getElementById` returns an arbitrary one. The icon sprite also owns
+generic ids — `#add`, `#alarm`, `#accessibility` and dozens more resolve to
+invisible sprite symbols rather than controls.
 
 **The watch page renders two or three copies of its own controls** — title, like
-button, description, comments — and hides all but one. Worse, for the like
-button the *first* match in document order is the hidden one, so an unscoped
-`querySelector` returns the wrong element. Scope to `#above-the-fold`, which
-holds exactly one visible copy of each.
+button, description, comments — and hides all but one. For the like button the
+*first* match in document order is the hidden one, so an unscoped
+`querySelector` returns the wrong element. Scope to `#above-the-fold`. A
+playlist does the same thing with its title, in three `h1` elements.
 
-**No heading identifies the home route.** All four `h1` elements there are
-empty. Test for `ytd-browse` instead.
+**Headings identify almost nothing.** Every `h1` is empty on home and on search.
+A channel's name is a non-empty `h1` but not the first one in document order.
 
 **Comments start at zero.** `ytd-comment-thread-renderer` matches nothing until
 the page is scrolled to the comment section. An empty count means not loaded,
 not a video without comments.
 
-**The guide drawer can render with no rows**, which means unpopulated rather
-than missing navigation. Exactly one of the drawer and the mini guide is
-visible at a time, and the hidden one still matches, so filter by visibility.
+**The 404 is not the app.** No `ytd-app`, no masthead, no `ytd-` or `yt-`
+element of any kind, eleven elements in the whole document, and no body text or
+heading. Only the title says "404 Not Found". Testing for `ytd-app` is the
+cheapest way to tell a 404 from a route that has not finished rendering.
 
-**Two mastheads exist.** The variant seen through most of this mapping carries a
-Back button and no avatar button at all, at a 1768px viewport on both routes; a
+**Nothing fetches the first page.** On a fresh load only `guide`, `player`,
+`log_event` and the stats endpoints appear — no browse or search call — because
+the first page of results is already in the document.
+
+**Two mastheads exist.** The variant seen through this mapping carries a Back
+button and no avatar button at all, at a 1768px viewport on every route; a
 variant with `#avatar-btn` appeared once and could not be reproduced. No account
 control is declared here as a result.
 
 ## Coverage
 
-Every selector was counted on the route that declares it — 19 on watch, 11 on
-home, all matching. `sightmap sel-probe` cannot attach to the browser this was
-authored in, so matches were counted in-page instead.
+All 47 selectors counted on their declaring route: watch 13, search 9, channel
+8, playlist 6, home 5, 404 1, plus the globals. Requests were read from the
+page's own Resource Timing entries.
 
-Home counts settle slowly: the feed grid read 3 items six seconds after
-navigation and was still 3 at sixteen, having read 42 in an earlier session, so
-treat feed-item counts as viewport- and session-dependent rather than fixed.
+`sightmap sel-probe` cannot attach to the browser this was authored in, so
+matches were counted in-page instead. Feed counts settle slowly and vary by
+viewport: the home grid read 42 items in one session and 3 in another, so treat
+item counts as viewport- and session-dependent rather than fixed.
