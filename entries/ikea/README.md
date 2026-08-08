@@ -8,7 +8,7 @@ categories: [commerce]
 author: chiplay
 created: 2026-08-06
 updated: 2026-08-08
-last_verified: 2026-08-06
+last_verified: 2026-08-08
 cli_version: 0.18.0
 spec_version: 1
 method: browser
@@ -25,7 +25,7 @@ The US storefront (`/us/en/`), mapped as a signed-out shopper.
 |---|---|---|
 | `Home` | `/us/en` | Category carousel and a stack of CMS-driven promo modules |
 | `SearchResults` | `/us/en/search` | Result summary, filter sidebar, product grid |
-| `CategoryBrowse` | `/us/en/cat/:categorySlug` | Page header, subcategory carousel, same product grid |
+| `CategoryBrowse` | `/us/en/cat/:categorySlug` | Page header, then either a subcategory carousel or the product grid |
 | `ProductDetail` | `/us/en/p/:productSlug` | Gallery, price, ratings, fulfillment, add to cart |
 | `NotFound` | `/**` | Catch-all page |
 
@@ -42,11 +42,23 @@ repeat `Home` under different names rather than describe new structure.
 ## Hazards
 
 **Learn the four class prefixes and most selector guessing disappears.** `hnf-`
-is the shared header, nav, and footer frame. `plp-` is the product list, and it
-is identical on search and category pages, so anything written against the grid
-works on both. `pipf-` is the product page. `crec-` is the recommendation
-fragment that loads late. A `plp-` class on a `/p/` URL means you are looking at
-a recommendation strip, not the product.
+is the shared header, nav, and footer frame. `plp-` is the product list, shared
+by search and category pages. `pipf-` is the product page. `crec-` is the
+recommendation fragment that loads late. A `plp-` class on a `/p/` URL means you
+are looking at a recommendation strip, not the product.
+
+**The `plp-` grid is only shared down to the card.** `#product-list`,
+`[data-testid="plp-product-card"]`, `[data-testid="plp-filter-side-bar"]` and
+`.plp-price-module` behave the same on search and on a category. Inside the card
+they do not: search renders `.plp-grid-product-card__*` and a category renders
+`.plp-mastercard__*`. A price selector written against a search result returns
+nothing on a category page and raises no error. Use `.plp-price-module`.
+
+**Half of `/cat/` has no products on it.** The same route serves a hub, which
+carries the subcategory carousel and nothing to buy, and a leaf, which carries
+the grid and filters and no carousel. `/cat/tables-chairs-fu002/` is a hub;
+`/cat/desk-chairs-20654/` is a leaf. Nothing in the URL distinguishes them —
+test for `#product-list` before concluding a category is empty.
 
 **A category id you got wrong sends you to the entire catalog.** The slug is
 decorative: `/cat/totally-made-up-fu002/` loads Tables & Chairs and rewrites the
