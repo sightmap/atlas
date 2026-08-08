@@ -64,7 +64,16 @@ views:
             place the site calls it that.
 
       - name: FavoriteButton
-        selector: '[data-testid="favorite-button"]'
+        selector: '[data-testid="pdp-main"] [data-testid="favorite-button"]'
+        memory:
+          - The bare testid also matches the Favorites link in the global nav, so
+            it has to be scoped to the product body.
+
+      - name: PromoBanner
+        selector: '[data-testid="banner-carousel"]'
+        memory:
+          - A rotating promotional strip at the top of the content area. Its text
+            changes on a timer, so an assertion against it is a race.
 
       - name: ImageCarousel
         selector: '[data-testid="ImageCarousel"]'

@@ -49,12 +49,6 @@ components:
         only becomes visible when a nav flyout opens. Finding it says nothing
         about whether a menu is showing.
 
-  - name: PromoBanner
-    selector: '[data-testid="banner-carousel"]'
-    memory:
-      - A rotating promotional strip at the top of the content area. Its text
-        changes on a timer, so an assertion against it is a race.
-
   - name: ContentWrapper
     selector: '#experience-wrapper'
     memory:

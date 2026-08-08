@@ -27,7 +27,7 @@ views:
             extract: text
 
       - name: NotFoundCarousel
-        selector: '.nds-carousel'
+        selector: '#ciclp-app .nds-carousel'
         memory:
           - The same design-system carousel used for recommendations elsewhere.
             Its presence here is why "found products" cannot stand in for "found

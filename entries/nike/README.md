@@ -8,7 +8,7 @@ categories: [commerce]
 author: chiplay
 created: 2026-08-06
 updated: 2026-08-08
-last_verified: 2026-08-06
+last_verified: 2026-08-08
 cli_version: 0.18.0
 spec_version: 1
 method: browser
@@ -29,10 +29,10 @@ The US storefront, mapped as a signed-out shopper.
 | `ProductDetail` | `/t/:productSlug/:styleCode` | Carousel, price, size grid, add to bag |
 | `NotFound` | `/**` | Apology line above a product carousel |
 
-`GlobalNav`, `NavScrim`, `PromoBanner`, `ContentWrapper`, `ModalRoot`,
-`RouteAnnouncer`, `EmbeddedMessaging`, and `GlobalFooter` are global. All five
-views report `0 orphaned` coverage, with every selector `sel-probe`d on
-2026-08-06.
+`GlobalNav`, `NavScrim`, `ContentWrapper`, `ModalRoot`, `RouteAnnouncer`,
+`EmbeddedMessaging`, and `GlobalFooter` are global. `PromoBanner` renders on
+`ProductDetail` only. All five views report `0 orphaned` coverage, with every
+selector `sel-probe`d live against all five view URLs on 2026-08-08.
 
 ## Hazards
 

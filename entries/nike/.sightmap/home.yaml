@@ -33,12 +33,12 @@ views:
             merchandising.
 
       - name: HomeCarousel
-        selector: '.nds-carousel'
+        selector: '#ciclp-app .nds-carousel'
         memory:
           - The same design-system carousel used on the product page and the 404.
 
       - name: CampaignLink
-        selector: 'a[aria-label]'
+        selector: '#ciclp-app a[aria-label]'
         properties:
           - name: label
             extract: attr=aria-label
