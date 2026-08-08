@@ -6,16 +6,15 @@ views:
     url: https://github.com/sightmap/sightmap/pull/168
     description: One pull request — conversation, commits, checks, and the diff, behind a sub-nav.
     memory:
-      - The sub-nav is `nav[aria-label="Pull request navigation tabs"]`, and it
-        is the only place the four sub-routes are enumerated. Conversation,
-        Commits, Checks and Files Changed are separate URLs, not client-side
-        tabs, so each is a full navigation.
-      - The diffstat is exposed as `data-testid` values that name the kind of
-        change rather than the file — `addition diffstat`, `neutral diffstat`.
-        The testid contains a space, which is legal and easy to get wrong when
-        writing the selector.
-      - A merged pull request still serves this page. Nothing about the route
-        distinguishes open from merged; the state badge in the header does.
+      - Conversation, Commits, Checks and Files changed are separate URLs, not
+        client-side tabs, so each one is a full navigation.
+      - The diffstat testids name the kind of change rather than the file and
+        contain a space — `addition diffstat`, `neutral diffstat`.
+      - A merged pull request serves the same route. Only the state badge in
+        the header separates open from merged.
+      - The sub-nav counts, the diffstat and the check rollups all arrive after
+        the document, so an immediate read finds the header without its
+        numbers.
     requests:
       - name: TabCounts
         route: /:owner/:repo/pull/:number/page_data/tab_counts

@@ -6,16 +6,14 @@ views:
     url: https://github.com/sightmap
     description: Organization profile — pinned items and the repository list.
     memory:
-      - This route is ambiguous by design. `/:org` and `/:user` are the same
-        URL shape, and nothing in the path says which one you are on. The
-        presence of `nav[aria-label="Organization"]` is the test — a user
-        profile does not have it.
-      - Repositories are `a[itemprop="name codeRepository"]`. The microdata
-        attribute has outlived several redesigns of this page and is the most
-        durable hook on it.
-      - Only public repositories appear when signed out, so a count read here
-        is a count of public repositories and not of the organization's
-        repositories.
+      - Nothing in the path separates `/:org` from `/:user`. The presence of
+        `nav[aria-label="Organization"]` is the test — a user profile has no
+        such nav.
+      - The repository links carry `itemprop="name codeRepository"`, which
+        looks like the obvious hook and is invisible to everything but a live
+        DOM query. Select on `data-hovercard-type` instead.
+      - Signed out, only public repositories are listed, so a count read here
+        is not the organization's repository count.
     requests:
       - name: TabCounts
         route: '/users/:org/tab_counts?repo=*'
@@ -51,7 +49,8 @@ views:
       - name: PinnedItems
         selector: '.js-pinned-items-reorder-container'
         memory:
-          - Legacy markup, still serving the pinned repositories grid.
+          - Matches twice — an outer container and an inner one nested inside
+            it — so a count of this selector is not a count of pinned items.
 
       - name: RepoList
         selector: '#org-repositories'
