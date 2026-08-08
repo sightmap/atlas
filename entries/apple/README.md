@@ -7,7 +7,7 @@ description: Editorial product pages and the configure-and-buy store, two system
 categories: [commerce]
 author: chiplay
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 last_verified: 2026-08-07
 cli_version: 0.18.0
 spec_version: 1
@@ -33,7 +33,7 @@ apple.com, mapped as a signed-out visitor.
 `NavSearchResultCount`, and `GlobalFooter` are global. All five views report
 `0 orphaned` coverage, with every selector `sel-probe`d on 2026-08-07.
 
-## What bites
+## Hazards
 
 **The 404 changes language with the URL.** The first path segment is a locale
 code, so `/fr/nope-xyz` returns "Page introuvable", `/no/nope-xyz` returns
