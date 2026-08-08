@@ -1,5 +1,86 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T16:39:55Z",
-  "entries": []
+  "generated_at": "2026-08-08T18:38:32Z",
+  "entries": [
+    {
+      "slug": "ebay",
+      "name": "eBay",
+      "site_url": "https://www.ebay.com/",
+      "domains": [
+        "ebay.com"
+      ],
+      "description": "Marketplace search, category browse, item detail, and the live-shopping hub, mapped as a signed-out shopper.",
+      "categories": [
+        "commerce"
+      ],
+      "author": "chiplay",
+      "created": "2026-08-06",
+      "updated": "2026-08-08",
+      "last_verified": "2026-08-06",
+      "cli_version": "0.18.0",
+      "spec_version": 1,
+      "method": "browser",
+      "auth": "none",
+      "stats": {
+        "views": 6,
+        "components": 70,
+        "requests": 9,
+        "properties": 25,
+        "memory": 58
+      },
+      "per_view": [
+        {
+          "name": "CategoryBrowse",
+          "route": "/b/:categoryName/:categoryId/:browseNode",
+          "components": 17,
+          "requests": 2
+        },
+        {
+          "name": "Home",
+          "route": "/",
+          "components": 6,
+          "requests": 0
+        },
+        {
+          "name": "ItemDetail",
+          "route": "/itm/:itemId",
+          "components": 12,
+          "requests": 0
+        },
+        {
+          "name": "LiveHub",
+          "route": "/ebaylive",
+          "components": 3,
+          "requests": 0
+        },
+        {
+          "name": "NotFound",
+          "route": "/**",
+          "components": 2,
+          "requests": 0
+        },
+        {
+          "name": "SearchResults",
+          "route": "/sch/i.html",
+          "components": 21,
+          "requests": 2
+        }
+      ],
+      "screenshots": [
+        "screenshots/01-search-results.webp",
+        "screenshots/02-item-detail.webp"
+      ],
+      "files": [
+        ".sightmap/category.yaml",
+        ".sightmap/config.yaml",
+        ".sightmap/home.yaml",
+        ".sightmap/item.yaml",
+        ".sightmap/live.yaml",
+        ".sightmap/not-found.yaml",
+        ".sightmap/search.yaml",
+        ".sightmap/shared.yaml"
+      ],
+      "commit": "de495d2949becc39e84a8fcd5f0a83ad407a00da"
+    }
+  ]
 }
