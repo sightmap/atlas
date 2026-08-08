@@ -1,44 +1,38 @@
 version: 1
 
 memory:
-  - Four naming conventions coexist and each covers a different part of the site.
-    Kebab-case testids (`listing-card-title`, `little-search`) name interactive
-    components. UPPER_SNAKE testids (`LISTINGS_CAROUSEL`, `HEADER`, `BANNER`)
-    name sections on SEO landing pages. `data-section-id` (`TITLE_DEFAULT`,
-    `AMENITIES_DEFAULT`) names the structure of a listing page. Slash-namespaced
-    testids (`map/GoogleMap`, `map/ZoomInButton`) belong to the map subsystem.
-    An agent that only looks at `data-testid` never sees the listing page's
-    outline at all.
-  - Class names are Linaria output and carry no meaning. There are also 31
-    elements with `data-testid="linaria-injector"`, which are style injection
-    points rather than content. Nothing on this site should be selected by class.
-  - Every browse path normalizes. `/s/Paris--France/experiences` becomes
-    `/ile-de-france/things-to-do`, and an unmatched path becomes `/404`. Reading
-    `location.pathname` after load is how you learn where you actually are.
-  - Prices and availability depend on the dates and guest count in the search
-    state, so the same listing shows different numbers across searches. A price
-    read from a card is only meaningful together with the query that produced it.
+  - Four selector vocabularies, one per surface. Kebab-case testids name
+    interactive components, UPPER_SNAKE testids name sections on SEO landing
+    pages, `data-section-id` names listing-page structure, and slash-namespaced
+    testids belong to the map. Querying only `data-testid` never reveals a
+    listing page's outline.
+  - Class names inside the React app are Linaria hashes that change per build.
+    Select by `data-testid` or `data-section-id` instead.
+  - Every browse path normalizes and an unmatched one becomes `/404`, so read
+    `location.pathname` after load rather than trusting the URL you asked for.
+  - Prices and availability come from the dates and guest count in the search
+    state rather than from the listing, so a price is only meaningful alongside
+    the query that produced it.
 
 components:
   - name: SkipLinks
     selector: '#site-skip-links'
     memory:
-      - The accessibility skip link, rendered outside the React root as a direct
-        child of `body`. Anything that walks down from `#react-application`
-        misses it.
+      - Rendered outside the React root as a direct child of `body`, so a walk
+        down from `#react-application` misses it.
 
   - name: AppRoot
     selector: '#react-application'
     memory:
-      - The React mount point wrapping every route except the error page, which
-        is server-rendered without it. That difference is a cheap structural test
-        for whether the app booted at all.
+      - Wraps every route except `/404`, which is server-rendered without it.
+        Its absence is the reliable test for the error page.
 
   - name: PageHeader
     selector: '#react-application header'
     memory:
-      - Scoped under the app root because a bare `header` selector is too broad
-        for a global.
+      - No `header` element exists anywhere on a listing page, so this global
+        silently skips `/rooms/:listingId`. The header controls are still there
+        — reach them through SearchHeader and HeaderProfileMenu.
 
   - name: PageMain
     selector: '#react-application main'
@@ -49,9 +43,9 @@ components:
   - name: SearchHeader
     selector: '[data-testid="little-search"]'
     memory:
-      - The collapsed search control in the header on browse and listing pages.
-        The home page uses the expanded `structured-search-input-*` form instead,
-        so the two surfaces have different search markup.
+      - Only listing and search-results pages carry this. The home page uses the
+        expanded `structured-search-input-*` form, and city landing pages have
+        no search control at all.
     children:
       - name: SearchLocation
         selector: '[data-testid="little-search-location"]'
@@ -71,21 +65,19 @@ components:
 
   - name: HeaderProfileMenu
     selector: '[data-testid="cypress-headernav-profile"]'
-    memory:
-      - The account menu. Its testid still carries a `cypress-` prefix from an
-        older test framework, the only one on the site that does.
 
   - name: TabListWrapper
     selector: '[data-testid="tab-list-wrapper"]'
     memory:
-      - Homes, Experiences, and Services. Switching tabs changes the search
-        vertical and the destination route.
+      - Switching between Homes, Experiences, and Services changes the search
+        vertical and the destination route, so set the tab before running a
+        query.
 
   - name: ContentScroller
     selector: '[data-testid="content-scroller"]'
     memory:
-      - A horizontal scroll container reused for card carousels and image
-        galleries, so finding one says nothing about what it holds.
+      - Reused for card carousels and image galleries alike, so finding one says
+        nothing about what it holds.
 
 requests:
   - name: PersistedGraphQlOperation
@@ -93,16 +85,10 @@ requests:
     method: GET
     description: Every GraphQL call the site makes. The first path segment is the operation name and the second is a sha256 that pins the query version.
     memory:
-      - The operation name is the most legible naming on the site. Where the DOM
-        gives Linaria hashes that mean nothing, the traffic gives
-        `StaysPdpReviewsQuery` and `PlaceListingPolygonQuery` — reading the
-        request path tells you what a page is doing faster than reading its
-        markup does.
-      - The trailing hash is a persisted-query id, not a resource id. It changes
-        when Airbnb changes the query, so match on the operation name and treat
-        the hash as a wildcard.
-      - Both methods are in use for the same style of call. Most are GET and a
-        few are POST, so a filter on method alone drops part of the family.
+      - The trailing hash is a persisted-query id that changes whenever Airbnb
+        changes the query, so match on the operation name and wildcard the hash.
+      - Most calls in this family are GET and a few are POST, so filtering on
+        method alone drops part of it.
 
   - name: HeaderData
     route: /api/v3/Header/*

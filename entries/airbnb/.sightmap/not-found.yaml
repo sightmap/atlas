@@ -6,19 +6,10 @@ views:
     url: https://www.airbnb.com/no-such-page-xyz-123
     description: Error page, reached by redirect from any unmatched path.
     memory:
-      - The most explicit error page in this atlas, and the one to point at as
-        the good example. An unmatched path redirects to `/404`, the title reads
-        "404 Page Not Found - Airbnb", and the body spells out the error code 404
-        in its own text. Path, title, and text all agree, so any of the three
-        detects it.
-      - Compare the other entries here. Amazon's 404 has no text at all, Vuori's
-        has an empty title, Nike's merchandises real products, and eBay's says
-        "We looked everywhere" without a code. Airbnb is the only one where the
-        obvious check works.
-      - The page drops the site chrome and the app itself. There is no
-        `#react-application` mount, no search header, no testids, and no
-        sections, just two `.page-container` blocks and eight links. The absence
-        of the React root is the strongest structural signal on the site.
+      - Path, title, and body text all state 404 independently, so any one of
+        the three detects this page.
+      - No testids and no `data-section-id` anywhere on this page. Class names
+        are the only hook here, unlike the rest of the site.
     components:
       - name: ErrorContent
         selector: '.page-container'
@@ -26,5 +17,4 @@ views:
           - name: message
             extract: text
         memory:
-          - Holds the apology, the error code, and a short list of recovery
-            links.
+          - Two blocks match, not one.
