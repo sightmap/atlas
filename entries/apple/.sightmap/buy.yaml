@@ -6,17 +6,15 @@ views:
     url: https://www.apple.com/shop/buy-mac/macbook-air
     description: Configure-and-buy page — stepped option selection with a running price in a sticky bar.
     memory:
-      - This is the purchase surface. The marketing page at `/macbook-air/` looks
-        like a product page and has no way to buy anything, so an agent that
-        lands there and looks for an add-to-cart control will not find one.
-      - Options are ordered steps (`.rf-bfe-step`) rather than a flat set of
-        fields — size, then chip, then memory and storage. Later steps depend on
-        earlier ones, so the configuration cannot be filled in arbitrary order.
-      - The sticky bar carries the running total and updates as options change,
-        which makes `.rf-bfe-header-price` the live price and `.rc-price` inside
-        the header the starting price. The two differ once anything is selected.
-      - Delivery estimates in the sticky bar come from the IP-inferred location
-        described in the footer disclosure.
+      - Options are ordered steps, not a flat set of fields, and later steps
+        depend on earlier ones. The configuration cannot be filled in arbitrary
+        order. How many steps there are varies by model.
+      - Two prices are on the page at once. StickyPrice is the running total and
+        StartingPrice is the model's base price; they diverge as soon as anything
+        is selected.
+      - Fulfillment text is derived from the location Apple infers from the
+        request's IP address, so delivery estimates change with where the request
+        originates rather than with anything on the page.
     components:
       - name: BuyExperience
         selector: '.rf-bfe'
@@ -24,8 +22,8 @@ views:
       - name: StickyBar
         selector: '.rf-bfe-stickybar'
         memory:
-          - Rendered above the viewport until the page scrolls, so its bounding
-            box has a negative top on load.
+          - Rendered above the viewport until the page scrolls, so on load its
+            bounding box has a negative top and it reads as off-screen.
         children:
           - name: StickyPrice
             selector: '.rf-bfe-header-price'
@@ -57,9 +55,6 @@ views:
             properties:
               - name: step_text
                 extract: text
-            memory:
-              - One per decision. The heading states the question ("Model. Choose
-                your size.") and the options follow.
           - name: DimensionChooser
             selector: '.rc-dimension'
           - name: ColorChooser
@@ -69,14 +64,17 @@ views:
                 extract: text
           - name: DecisionSupport
             selector: '.rf-bfe-decision-support'
-            memory:
-              - Inline help offering a comparison when a step is ambiguous.
 
       - name: CustomizableSpecs
         selector: '.rs-mac-bfe-collapsible-config-section'
         properties:
           - name: specs_text
             extract: text
+        memory:
+          - Models with nothing to configure omit this section entirely, so no
+            cards is a valid state rather than a failed render.
+          - The id `customizableSpecs` belongs to the step's heading, not to this
+            section, so scoping a card query under it finds nothing.
         children:
           - name: ConfigureCard
             selector: '.re-configure-card'
@@ -90,8 +88,7 @@ views:
           - name: promo
             extract: text
         memory:
-          - A promotional strip above the buy flow. Its copy rotates, so it is
-            not a fixed string.
+          - Its copy rotates, so it cannot be matched as a fixed string.
 
     requests:
       - name: PurchaseOptions

@@ -6,21 +6,15 @@ views:
     url: https://www.apple.com/macbook-air/
     description: Editorial product page — local nav, marquee, and scroll-driven media galleries.
     memory:
-      - This page cannot sell anything. It states a starting price and links to
-        the store, but there is no configurator and no add-to-cart control; those
-        live at `/shop/buy-mac/:model`. An agent looking for a purchase surface
-        here will search a very long page and find nothing.
-      - The local nav (`#ac-localnav`) is the product's own sub-navigation and is
-        the fastest way to reach Tech Specs or Compare. It appears only on
-        marketing pages, never in the store.
-      - Content is built from repeated generic blocks — `.section`, `.marquee`,
-        `.gallery-item`, `.media-block-container` — whose classes name the layout
-        pattern rather than the topic. Identity comes from the headline text
-        inside them.
-      - The page is roughly 28,000 pixels tall and much of it is video that
-        autoplays on scroll, with paired `-startframe-` and `-endframe-` image
-        ids standing in before playback. A snapshot taken at the top sees
-        placeholder frames rather than the final imagery.
+      - This route serves two different page builds. The one mapped here has
+        `#main`, `.section` and `.gallery-item`; pages like /mac/, /ipad/ and
+        /watch/ use a newer build with hashed class names and none of those
+        hooks. MainRegion is the only anchor common to both.
+      - Block classes name the layout pattern, not the topic, and repeat many
+        times per page. Identity comes from the headline text inside a block.
+      - Most of the page is video that autoplays on scroll, standing in
+        beforehand as paired start-frame and end-frame images. A snapshot taken
+        at the top reads placeholders, so scroll before capturing.
     components:
       - name: LocalNav
         selector: '#ac-localnav'
@@ -28,8 +22,9 @@ views:
           - name: nav_items
             extract: text
         memory:
-          - Overview, Tech Specs, Compare, and the buy link. Present on marketing
-            pages only.
+          - The shortcut to Tech Specs and Compare, but only a minority of
+            product pages have one. When it is missing there is no sub-navigation
+            to fall back on.
 
       - name: MainContent
         selector: '[role="main"]'
@@ -42,9 +37,6 @@ views:
 
       - name: Marquee
         selector: '.marquee'
-        memory:
-          - The hero block. Its headline and the price sit in separate children,
-            so neither is readable from the marquee alone.
         children:
           - name: MarqueeEyebrow
             selector: '.header-eyebrow'
@@ -62,17 +54,14 @@ views:
               - name: pricing
                 extract: text
             memory:
-              - The starting price and financing copy, carrying footnote markers
-                as literal asterisks in the text.
+              - Footnote markers land in this text as literal asterisks, so strip
+                them before parsing a price.
 
       - name: ContentSection
         selector: '.section'
         properties:
           - name: section_text
             extract: text
-        memory:
-          - The generic page block, repeated many times. Which sections exist is
-            per-product editorial, so match on the headline rather than position.
 
       - name: ScrollGallery
         selector: '.scroll-container'
@@ -89,13 +78,9 @@ views:
         method: GET
         description: The "From $999" price shown on this editorial page, pulled from the store rather than authored into the page.
         memory:
-          - Two of these fire per load, differing only in the locale segment —
-            `/us/shop/` for consumer pricing and `/us-edu/shop/` for education
-            pricing. The page picks one to display, so the price on screen is a
-            choice made after both arrived.
-          - This is the only point where the marketing system talks to the store
-            system. Everything else on the page is editorial content with no way
-            to buy.
+          - Prices are not authored into the page, they arrive by XHR after load
+            and in more than one call (consumer under `/us/shop/`, education
+            under `/us-edu/shop/`). A DOM read before they land finds no price.
 
       - name: VideoLocalization
         route: /ac/ac-video/latest/json/localization/*.json
