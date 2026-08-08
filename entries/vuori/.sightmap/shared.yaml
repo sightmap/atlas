@@ -102,6 +102,9 @@ components:
         (`kl-private-reset-css-Xuajs1`), so only the `.klaviyo-form` class is
         durable.
 
+  - name: NewsletterTeaser
+    selector: '[data-testid="animated-teaser"]'
+
   - name: GlobalFooter
     selector: '#__next footer'
     memory:
@@ -122,6 +125,15 @@ components:
         memory:
           - A wrapper for copy containing inline links, used for the newsletter
             consent text. The links inside it are legal pages.
+      - name: EmailSignup
+        selector: 'button[aria-label="Sign Up"]'
+        memory:
+          - The newsletter field beside it is a `[role="textbox"]` whose id is
+            React `useId` output (`#:R16n55am:`), so the button's label is the
+            only stable handle on this form.
+
+  - name: ChatLauncher
+    selector: 'img[alt="Kustomer Chat Icon"]'
 
   - name: FeedbackWidget
     selector: '#kampyleButtonContainer'

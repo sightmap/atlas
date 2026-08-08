@@ -81,7 +81,7 @@ views:
             on it.
 
       - name: CollectionCopy
-        selector: '[data-testid="rich-text-editor"]'
+        selector: '#main-content [data-testid="rich-text-editor"]'
         memory:
           - SEO copy below the grid, collapsed behind a "Read More" toggle.
 

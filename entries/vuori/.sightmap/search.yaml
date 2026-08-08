@@ -20,8 +20,11 @@ views:
           - name: result_summary
             extract: text
 
+      - name: FiltersAccordion
+        selector: '[data-testid="FiltersAccordion"]'
+
       - name: ProductRow
-        selector: '[data-testid="Plp-ConnectedProductRow"]'
+        selector: '[data-testid="SearchPage-ConnectedProductRow"]'
 
       - name: ProductCard
         selector: '[data-testid="productCard"]'

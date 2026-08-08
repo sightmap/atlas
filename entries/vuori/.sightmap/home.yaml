@@ -33,7 +33,7 @@ views:
             extract: text
 
       - name: PopularCategoriesTabs
-        selector: '[role="tablist"]'
+        selector: '#main-content [role="tablist"]'
         memory:
           - Men and Women. Switching tabs swaps the carousel below without
             changing the URL, so the selected tab is not recoverable from the
@@ -59,10 +59,3 @@ views:
         children:
           - name: AboutHeroOverlay
             selector: '[data-testid="hero-overlay-interactive"]'
-
-      - name: EmailSignup
-        selector: 'button[aria-label="Sign Up"]'
-        memory:
-          - The newsletter field beside it is a `[role="textbox"]` whose id is
-            React `useId` output (`#:R16n55am:`), so the button's label is the
-            only stable handle on this form.
