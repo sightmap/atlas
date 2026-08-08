@@ -1,0 +1,58 @@
+version: 1
+
+memory:
+  - Mapped signed-out. Every view here is a public page; signing in adds
+    surfaces this corpus does not cover and changes some of the ones it does.
+  - GitHub is mid-migration between two frontends and both are in production at
+    once. Legacy pages carry hand-written `js-` prefixed hooks. React pages
+    carry `data-testid` and `aria-label`ed landmarks. The two never appear on
+    the same page, so the first thing to establish on any route is which
+    frontend served it.
+  - Do not select on ids like `#_R_2qbd_` or classes like
+    `.Primer_Brand__Text-module__Text___XeGJJ`. The first is a React-generated
+    node id that changes between renders of the same page; the second is a CSS
+    module hash that changes on every deploy.
+  - The CSS module prefix, unlike the hash, is derived from the source module
+    name and does survive a rebuild. `[class*="Primer_Brand__Text-module__Text___"]`
+    is stable where the full class is not. Prefer `class*=` over `class^=` —
+    `^=` matches the start of the whole class attribute, so it silently depends
+    on that class happening to be listed first.
+
+components:
+  - name: GlobalHeader
+    selector: 'nav[aria-label="Global"]'
+    memory:
+      - Present on every signed-out route including the 404, and the one
+        component in this corpus that does not survive a session. Signed in,
+        this matches nothing — the header is replaced by
+        `header[aria-label="Global navigation menu"]`, and a breadcrumb nav
+        appears beside it that is absent signed out. Verified in a real
+        signed-in browser — every other selector in this corpus matched
+        identically in both states, so this is the only place the signed-out
+        assumption changes what you get.
+
+  - name: SkipToContent
+    selector: '#start-of-content'
+    memory:
+      - Marks where chrome ends and the route's own content begins. Useful as a
+        boundary when a page's real landmark differs by frontend.
+
+  - name: GlobalFooter
+    selector: 'nav[aria-label="Footer"]'
+
+  - name: RepoPjaxContainer
+    selector: '#js-repo-pjax-container'
+    memory:
+      - The `<main>` element on every repository-scoped route. Named for pjax,
+        which the React pages no longer use, but the id survived the migration
+        and is currently the most reliable "am I on a repo page" test.
+
+  - name: RepoNav
+    selector: 'nav[aria-label="Repository"]'
+    properties:
+      - name: tabs
+        extract: text
+    memory:
+      - The Code / Issues / Pull requests / Discussions tab bar. Its labels
+        carry counts, so reading this one element gives the open issue and PR
+        totals without visiting either list.

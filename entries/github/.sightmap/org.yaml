@@ -1,0 +1,40 @@
+version: 1
+
+views:
+  - name: OrgProfile
+    route: /:org
+    url: https://github.com/sightmap
+    description: Organization profile — pinned items and the repository list.
+    memory:
+      - This route is ambiguous by design. `/:org` and `/:user` are the same
+        URL shape, and nothing in the path says which one you are on. The
+        presence of `nav[aria-label="Organization"]` is the test — a user
+        profile does not have it.
+      - Repositories are `a[itemprop="name codeRepository"]`. The microdata
+        attribute has outlived several redesigns of this page and is the most
+        durable hook on it.
+      - Only public repositories appear when signed out, so a count read here
+        is a count of public repositories and not of the organization's
+        repositories.
+    components:
+      - name: OrgNav
+        selector: 'nav[aria-label="Organization"]'
+        properties:
+          - name: tabs
+            extract: text
+
+      - name: PinnedItems
+        selector: '.js-pinned-items-reorder-container'
+        memory:
+          - Legacy markup, still serving the pinned repositories grid.
+
+      - name: RepoList
+        selector: '#org-repositories'
+        children:
+          - name: RepoLink
+            selector: 'a[itemprop="name codeRepository"]'
+            properties:
+              - name: repo_name
+                extract: text
+              - name: href
+                extract: attr=href

@@ -1,0 +1,52 @@
+version: 1
+
+views:
+  - name: PullDetail
+    route: /:owner/:repo/pull/:number
+    url: https://github.com/sightmap/sightmap/pull/168
+    description: One pull request — conversation, commits, checks, and the diff, behind a sub-nav.
+    memory:
+      - The sub-nav is `nav[aria-label="Pull request navigation tabs"]`, and it
+        is the only place the four sub-routes are enumerated. Conversation,
+        Commits, Checks and Files Changed are separate URLs, not client-side
+        tabs, so each is a full navigation.
+      - The diffstat is exposed as `data-testid` values that name the kind of
+        change rather than the file — `addition diffstat`, `neutral diffstat`.
+        The testid contains a space, which is legal and easy to get wrong when
+        writing the selector.
+      - A merged pull request still serves this page. Nothing about the route
+        distinguishes open from merged; the state badge in the header does.
+    components:
+      - name: PullNav
+        selector: 'nav[aria-label="Pull request navigation tabs"]'
+        properties:
+          - name: tabs
+            extract: text
+
+      - name: AdditionDiffstat
+        selector: '[data-testid="addition diffstat"]'
+
+      - name: NeutralDiffstat
+        selector: '[data-testid="neutral diffstat"]'
+
+  - name: NotFound
+    route: /**
+    url: https://github.com/sightmap/sightmap/no-such-page-xyz-123
+    description: 404 page, served with a real 404 status.
+    memory:
+      - Returns an actual 404 rather than a 200 with an error body, which is
+        rarer than it should be and means the status code can be trusted here.
+      - The page has no `h1` at all. Anything keying "did I land somewhere
+        real" on the presence of a heading will read this page as a loading
+        state. Test for the 404 illustration instead.
+    components:
+      - name: NotFoundMain
+        selector: 'main'
+        properties:
+          - name: message
+            extract: text
+
+      - name: NotFoundArt
+        selector: 'img[alt*="404"]'
+        memory:
+          - The only positive signal on the page that it is a 404.

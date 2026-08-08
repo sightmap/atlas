@@ -1,0 +1,88 @@
+version: 1
+
+views:
+  - name: RepoHome
+    route: /:owner/:repo
+    url: https://github.com/sightmap/sightmap
+    description: Repository landing page — file listing, latest commit, and the rendered README.
+    memory:
+      - The file table is addressed by what labels it rather than by a class
+        — `table[aria-labelledby="folders-and-files"]`. The classes on it are
+        hashed CSS modules and will not survive a deploy.
+      - The rendered README is `article.markdown-body`, which is also the
+        rendered file on a blob page. It is the same component in both places,
+        so one selector reads rendered Markdown anywhere on the site.
+    components:
+      - name: RepoHeader
+        selector: '#repository-container-header'
+        properties:
+          - name: header_text
+            extract: text
+
+      - name: FileTreeNav
+        selector: 'nav[aria-label="Repository files"]'
+        memory:
+          - The sidebar file tree. Present here and absent on a blob page,
+            which makes it a usable test for which of the two you are on.
+
+      - name: FileTable
+        selector: 'table[aria-labelledby="folders-and-files"]'
+        properties:
+          - name: entries
+            extract: text
+
+      - name: LatestCommit
+        selector: '[data-testid="latest-commit"]'
+        properties:
+          - name: commit_text
+            extract: text
+        children:
+          - name: LatestCommitDetails
+            selector: '[data-testid="latest-commit-details"]'
+
+      - name: ViewAllFilesRow
+        selector: '[data-testid="view-all-files-row"]'
+
+      - name: Readme
+        selector: 'article.markdown-body'
+        properties:
+          - name: readme_text
+            extract: text
+
+  - name: FileBlob
+    route: /:owner/:repo/blob/:ref/**
+    url: https://github.com/sightmap/sightmap/blob/main/README.md
+    description: A single file at a ref, rendered when the file is Markdown.
+    memory:
+      - The selector `nav[aria-label="Repository files"]` matches nothing here
+        even though the sidebar looks the same as on the repository landing
+        page. Its absence is the cheapest way to tell a blob from a repo root.
+      - A Markdown file renders as `article.markdown-body`. A source file does
+        not — it renders as a code viewer instead, so this selector is not a
+        general "the file content" hook, only "the rendered document".
+      - The `[data-testid="latest-commit"]` strip appears here too, scoped to
+        the file rather than the repository.
+    components:
+      - name: StickyHeader
+        selector: '#StickyHeader'
+        properties:
+          - name: path
+            extract: text
+        memory:
+          - Carries the file path and appears on scroll, but is in the document
+            from the start, so it can be read without scrolling.
+
+      - name: BlobActions
+        selector: '.react-blob-header-edit-and-raw-actions'
+        memory:
+          - Holds the Raw / Copy / Download controls. The Raw link is the route
+            to the file's bytes without any of this page around it.
+
+      - name: RenderedFile
+        selector: 'article.markdown-body'
+        properties:
+          - name: file_text
+            extract: text
+
+      - name: FileLatestCommit
+        selector: '[data-testid="latest-commit"]'
