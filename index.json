@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T19:49:09Z",
+  "generated_at": "2026-08-08T20:01:23Z",
   "entries": [
     {
       "slug": "airbnb",
@@ -627,6 +627,48 @@
       "commit": "84409442e496621ce0aac1b2e51b16cbb48355bb"
     },
     {
+      "slug": "spotify",
+      "name": "Spotify",
+      "site_url": "https://open.spotify.com/",
+      "domains": [
+        "open.spotify.com"
+      ],
+      "description": "Spotify's web player album view, mapped signed in — album header, track list, and the playback chrome around them.",
+      "categories": [
+        "media"
+      ],
+      "author": "chiplay",
+      "created": "2026-08-08",
+      "updated": "2026-08-08",
+      "last_verified": "2026-08-08",
+      "cli_version": "0.19.0",
+      "spec_version": 1,
+      "method": "browser",
+      "auth": "personal-account",
+      "stats": {
+        "views": 1,
+        "components": 25,
+        "requests": 0,
+        "properties": 7,
+        "memory": 12
+      },
+      "per_view": [
+        {
+          "name": "AlbumDetail",
+          "route": "/album/:albumId",
+          "components": 12,
+          "requests": 0
+        }
+      ],
+      "screenshots": [],
+      "files": [
+        ".sightmap/album.yaml",
+        ".sightmap/config.yaml",
+        ".sightmap/shared.yaml"
+      ],
+      "commit": "8ac783260b8eff713e77560778daaea465e56cf1"
+    },
+    {
       "slug": "uniqlo",
       "name": "UNIQLO",
       "site_url": "https://www.uniqlo.com/us/en/",
@@ -821,6 +863,49 @@
         ".sightmap/watch.yaml"
       ],
       "commit": "8110c7dc52282952b438022c3522fb049afb7605"
+    },
+    {
+      "slug": "zillow",
+      "name": "Zillow",
+      "site_url": "https://www.zillow.com/",
+      "domains": [
+        "zillow.com",
+        "www.zillow.com"
+      ],
+      "description": "Zillow's signed-in landing page — search bar, top navigation, and the carousel of recommended homes.",
+      "categories": [
+        "commerce"
+      ],
+      "author": "chiplay",
+      "created": "2026-08-08",
+      "updated": "2026-08-08",
+      "last_verified": "2026-08-08",
+      "cli_version": "0.19.0",
+      "spec_version": 1,
+      "method": "browser",
+      "auth": "personal-account",
+      "stats": {
+        "views": 1,
+        "components": 9,
+        "requests": 0,
+        "properties": 2,
+        "memory": 8
+      },
+      "per_view": [
+        {
+          "name": "Home",
+          "route": "/",
+          "components": 6,
+          "requests": 0
+        }
+      ],
+      "screenshots": [],
+      "files": [
+        ".sightmap/config.yaml",
+        ".sightmap/home.yaml",
+        ".sightmap/shared.yaml"
+      ],
+      "commit": "df600fb1c5b473c159c47686c097f7738b59d1d8"
     }
   ]
 }
