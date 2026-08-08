@@ -1,0 +1,36 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+SPDX-License-Identifier: CC-BY-4.0
+Full legal text: https://creativecommons.org/licenses/by/4.0/legalcode
+Plain-language summary: https://creativecommons.org/licenses/by/4.0/
+
+## What this covers
+
+Contributor-authored material in atlas entries (`entries/<slug>/`):
+
+- `.sightmap/` corpus YAML: view and component names, selectors, properties,
+  request definitions, and memory notes
+- `README.md` prose: coverage notes, quirks, known gaps
+- front-matter metadata
+
+Anyone may copy, redistribute, adapt, and use this material, including
+commercially, provided they credit the author. Each entry names its author in
+front matter; the gallery at sightmap.org/atlas and `index.json` carry that
+attribution, and downstream users should preserve it.
+
+By contributing an entry you license your contribution under CC BY 4.0.
+
+## What this does not cover
+
+**Screenshots** (`entries/<slug>/screenshots/`) depict third-party user
+interfaces. Contributors do not own that interface and cannot license it.
+Screenshots are included for identification and commentary; all rights in the
+depicted software, trademarks, and branding remain with their owners, and
+inclusion implies no endorsement or affiliation. See docs/POLICY.md for the
+removal process.
+
+**Mapped websites themselves** are not licensed by this repository. A sightmap
+describes a site's observable surface and grants no rights in that site.
+
+Tooling in this repository (`scripts/`, `schema/`, workflows) is MIT-licensed —
+see LICENSE.

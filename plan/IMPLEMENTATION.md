@@ -21,11 +21,12 @@ End-to-end build plan for the Sightmap Atlas: this content repo, two CLI verbs i
 
 P2 can proceed in parallel with P1. P4's scaffolding (routes, components) can start against fixture data once P2 lands; final wiring needs P3's real index.
 
-## Provisioning needed from a maintainer (not agent work)
+## Provisioning (maintainer, not agent work)
 
-- Takedown contact email (POLICY.md placeholder `TBD@sightmap.org`).
-- `ATLAS_BOT_TOKEN` secret in this repo: fine-grained PAT (or GitHub App) with contents+PR write on sightmap/sightmap, for the vendoring bot PR (P2.4).
-- Branch protection on `main` here: require the validate workflow, no force pushes.
+- ✅ Takedown contact: `atlas@sightmap.org` (forwards to support).
+- ✅ `ATLAS_BOT_TOKEN` secret: fine-grained PAT with contents+PR write on sightmap/sightmap, for the vendoring bot PR (P2.4).
+- ✅ Licensing decided: CC BY 4.0 for entry content, MIT for tooling.
+- ⬜ Branch protection on `main`: require the validate workflow, no force pushes. Set this once P2.3 has run green on a real PR, so the required check exists by name.
 
 ## Architecture invariants (why the plan looks like this)
 
