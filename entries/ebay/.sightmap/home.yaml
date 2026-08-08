@@ -6,41 +6,29 @@ views:
     url: https://www.ebay.com/
     description: Merchandised landing page — category flyout, live-shopping carousel, and rotating promotional modules.
     memory:
-      - Almost everything below the category nav is merchandising that changes
-        between loads and between visitors. The stable parts are the flyout nav,
-        the eBay Live carousel, and the footer; the promotional modules in
-        between are not worth asserting against.
-      - Promotional modules carry generated ids of the form
-        `s0-0-1-1-0-2-…-container`. They look like stable hooks and are not —
-        they encode the module's position in that render, so they change whenever
-        the merchandising does.
-      - There is no product grid here. The first surface that lists items is
-        search or a category page, so an agent looking for products should go
-        straight to `/sch/i.html?_nkw=` rather than trying to scrape the landing
-        page.
+      - Everything between the category nav and the footer is merchandising
+        chosen per render. Nothing in it is worth asserting against.
+      - Promotional module ids of the form `s0-0-1-1-0-2-…-container` look like
+        stable hooks and are not — they encode a module's position in one
+        render.
+      - There is no product grid on the landing page. The first surface that
+        lists items is `/sch/i.html?_nkw=` or a `/b/` category.
     components:
       - name: MerchandisedBody
         selector: '[data-testid="parent-layout"]'
         memory:
-          - Wraps every promotional module on the page. Mapped as one region on
-            purpose — the modules inside it are chosen per render, so naming them
-            individually would describe one visit rather than the page.
-          - The modules are `section` elements with an accessible name ("Today's
-            Deals", "Up to 50% off back-to-school deals"). Matching on that name
-            is the only durable way to find a specific one, and any given name
-            may simply not be present.
+          - The modules inside are `section` elements with an accessible name
+            such as "Today's Deals". Matching that name is the only durable way
+            to find one, and any given name may be absent.
 
       - name: CategoryFlyoutNav
         selector: '#vl-flyout-nav'
         memory:
-          - The horizontal category strip under the header. Its entries open
-            hover panels, and each also has a plain href to the matching `/b/`
-            category page, so following the link is the reliable path.
+          - Entries open hover panels, but each also carries a plain href to its
+            `/b/` category page — follow the href rather than driving the hover.
 
       - name: LiveEventsCarousel
         selector: '#dp-live-events-carousel'
-        memory:
-          - Also appears on `/ebaylive`, where it sits below the main feed.
         children:
           - name: LiveCarouselHeader
             selector: '.live-event-video-carousel__header'
@@ -53,6 +41,3 @@ views:
 
       - name: HomeFooterRegion
         selector: '#dp-global-footer'
-        memory:
-          - A home-page and eBay Live wrapper around the site-wide `#glbfooter`.
-            It is absent on search, category, and item pages.

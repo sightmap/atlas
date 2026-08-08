@@ -6,16 +6,19 @@ views:
     url: https://www.ebay.com/b/Action-Figures/261068/bn_1642089
     description: Category browse — breadcrumbs and a category tree, then either refinements and a grid of item cards or a set of merchandised modules.
     memory:
+      - This one route serves two page shapes and nothing in the URL says which.
+        A hub such as `/b/Toys-Hobbies/220/bn_1865497` carries merchandised
+        modules and no listings at all. A leaf such as
+        `/b/Action-Figures/261068/bn_1642089` carries the refinements, the
+        controls bar and the item river. Test for `#brw-refinement-root` before
+        looking for items; the exemplar URL above is a leaf.
       - The name segment is decorative. `/b/Totally-Made-Up-Name/220/bn_1865497`
-        loads Toys & Hobbies and rewrites the path to the canonical name, so an
-        agent must not read the category it is on out of the URL it requested.
-      - Worse, a mismatched name and id pair resolves to an unrelated category
-        rather than erroring. `/b/Cordless-Drills/184644/bn_1853799` serves
-        Porcelain Nativity Items with a 200 and no warning. Confirm the landing
-        category by reading `.textual-display` after load.
-      - This is a different page from search with a different card class.
-        `.brwrvr__item-card` here, `li.s-card` on `/sch/i.html`, and neither
-        selector matches on the other route.
+        loads Toys & Hobbies and rewrites the path, so the URL you requested
+        never tells you what you got.
+      - A mismatched name and id pair resolves to an unrelated category rather
+        than erroring. `/b/Cordless-Drills/184644/bn_1853799` serves Porcelain
+        Nativity Items with a 200. Read `h1.textual-display` to find out where
+        you landed.
     components:
       - name: Breadcrumbs
         selector: '.seo-breadcrumbs-container'
@@ -29,8 +32,11 @@ views:
           - name: category_name
             extract: text
         memory:
-          - The authoritative answer to "which category am I actually on", since
-            the URL path cannot be trusted.
+          - The only trustworthy answer to which category loaded, given that
+            both the name segment and a mismatched id resolve silently.
+          - The bare `.textual-display` class is eBay's generic type wrapper and
+            matches over 700 nodes on this page. The `h1` qualifier is what
+            reduces it to the heading.
 
       - name: CategoryNav
         selector: '.brw-category-nav'
@@ -53,10 +59,9 @@ views:
           - name: carousel_heading
             extract: text
         memory:
-          - Merchandised carousels such as "Limited time deals" that sit above
-            the item river. Their cards are `.brw-product-card`, a third card
-            class distinct from both `.brwrvr__item-card` in the river below and
-            `li.s-card` on search.
+          - Merchandised carousels above the item river. Their cards are
+            `.brw-product-card`, not the `.brwrvr__item-card` of the river
+            below.
         children:
           - name: PromoCard
             selector: '.brw-product-card'
@@ -64,34 +69,34 @@ views:
       - name: RecommendationCarousel
         selector: '.generic-host-carousel'
         memory:
-          - The "You may also like" strip. Contents are personalized and rotate,
-            so treat presence as optional.
+          - Personalized and rotating, and absent from leaf categories. Treat
+            presence as optional.
 
       - name: EventModules
         selector: '.brw-uep'
         memory:
-          - Editorial and event promos injected into the category page. Present
-            on some categories and absent on others.
+          - Editorial and event promos. Present on hub categories and absent
+            from leaves, which is the mirror of `.brw-river` being present.
 
       - name: SeoLinkList
         selector: '.seo-expandable-list'
         memory:
-          - Related-category links rendered for search engines. Useful as a
-            cheap way to enumerate sibling categories without opening the nav.
+          - Related-category links rendered for search engines — a cheap way to
+            enumerate sibling categories without opening the nav.
 
       - name: RelatedSearchesNav
         selector: '#seo-related-search-container'
         memory:
-          - A dozen related query links at the foot of the page. They point at
-            `/sch/i.html?_nkw=`, so this is the one place on a category page that
-            hands you keyword searches rather than more categories.
+          - Points at `/sch/i.html?_nkw=`, so this is the one place on a
+            category page that hands you keyword searches rather than more
+            categories.
 
       - name: CategoryMain
         selector: '#mainContent'
         memory:
-          - The page's `main` landmark. It carries no accessible name here, so it
-            has to be matched by id — and the same id wraps a completely
-            different subtree on every other route.
+          - The `main` landmark, matched by id because it carries no accessible
+            name. Search does not use this id — its equivalent region is
+            `[data-testid="mainContent"]`.
 
       - name: ItemRiver
         selector: '.brw-river'

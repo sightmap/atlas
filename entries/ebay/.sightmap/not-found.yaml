@@ -6,14 +6,11 @@ views:
     url: https://www.ebay.com/no-such-page-xyz-123
     description: Catch-all error page served for any unmatched path.
     memory:
-      - Reached by any path that matches no other route, which no page links to
-        — a link crawl will never find it.
-      - It renders the full global header, the search form, and the footer, so
-        "the chrome is present" is not evidence that a real page loaded. The
-        reliable signals are the title (`Error Page | eBay`) and the presence of
-        `.error-page-v2`.
-      - The heading reads "We looked everywhere." with no mention of a status
-        code, so an agent matching on the string "404" will not recognize it.
+      - The full header, search form, and footer render here, so chrome being
+        present is not evidence that a real page loaded. Check for
+        `.error-page-v2` or the title `Error Page | eBay`.
+      - The heading reads "We looked everywhere." and no status code appears
+        anywhere, so matching on the string 404 will not recognize it.
     components:
       - name: ErrorPage
         selector: '.error-page-v2'
