@@ -7,7 +7,7 @@ description: US storefront — the shared product wall behind both search and ca
 categories: [commerce]
 author: chiplay
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-08-08
 last_verified: 2026-08-06
 cli_version: 0.18.0
 spec_version: 1
@@ -34,7 +34,7 @@ The US storefront, mapped as a signed-out shopper.
 views report `0 orphaned` coverage, with every selector `sel-probe`d on
 2026-08-06.
 
-## What bites
+## Hazards
 
 **Search and category browse are the same page.** `/w?q=<terms>` and
 `/w/<categorySlug>` both render `#Wall` with the same `.product-card` grid and
