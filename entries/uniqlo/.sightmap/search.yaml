@@ -46,12 +46,6 @@ views:
               - name: tile_text
                 extract: text
 
-      - name: SearchDisclaimer
-        selector: '.fr-ec-gutter-container'
-        properties:
-          - name: disclaimer
-            extract: text
-
     requests:
       - name: ProductSearch
         route: /us/api/commerce/v5/en/products/search

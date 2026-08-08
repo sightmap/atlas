@@ -31,12 +31,6 @@ views:
               - name: table_text
                 extract: text
 
-      - name: ProductLayout
-        selector: '.fr-ec-layout'
-        memory:
-          - The gallery and buy controls share this generic layout wrapper, which
-            is the only container above them that is not a spacing utility.
-
     requests:
       - name: ProductVariants
         route: /us/api/commerce/v5/en/products/*/price-groups/*/l2s
