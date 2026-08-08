@@ -1,0 +1,32 @@
+version: 1
+
+views:
+  - name: Home
+    route: /
+    url: https://www.facebook.com/
+    description: The signed-in home route — navigation regions, search, and the content column.
+    memory:
+      - This page carries no `data-testid` anywhere and 688 distinct atomic
+        class names of a hashed form. Neither test ids nor classes address
+        anything, so ARIA roles and labels are the only usable hooks.
+      - There is no `article` element on the page. Posts and notification rows
+        are `div[role="article"]`, so the element selector matches nothing while
+        the role selector works.
+      - Timestamps are `aria-label` text such as `3 hours ago` on a link, not
+        `time` elements with a `datetime` attribute. A relative string is all
+        that is available.
+      - The home route does not always show the feed. On the render mapped here
+        it showed the notifications panel, and the two `div[role="article"]`
+        matches were notification rows carrying no image, no action buttons, and
+        no post permalink. Test what the main region actually holds rather than
+        assuming a feed.
+      - No feed rendered while the tab was in the background. Treat any count
+        from this route as a floor, not a total.
+    components:
+      - name: ContentArticle
+        selector: 'div[role="article"]'
+        description: One article-role row in the main column. A feed post or a notification, depending on what the route is showing.
+        memory:
+          - Its contents are the account's — a friend's post or the account's
+            own notifications. The row is structure; nothing inside it is
+            corpus material.

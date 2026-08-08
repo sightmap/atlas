@@ -1,0 +1,46 @@
+version: 1
+
+components:
+  - name: PrimaryNav
+    selector: 'div[role="navigation"][aria-label="Facebook"]'
+    description: Top navigation — Home, Reels, Marketplace, Groups, Gaming.
+    memory:
+      - Navigation is split across three separately labelled regions rather than
+        one. Selecting `div[role="navigation"]` alone returns all three, so the
+        `aria-label` is the part that disambiguates.
+
+  - name: ShortcutsNav
+    selector: 'div[role="navigation"][aria-label="Shortcuts"]'
+    description: Left rail of saved destinations. Its entries are account state.
+
+  - name: AccountNav
+    selector: 'div[role="navigation"][aria-label="Account Controls and Settings"]'
+    description: Messenger, notifications, and the profile menu. Identity — never extract from it.
+
+  - name: SearchField
+    selector: 'input[type="search"]'
+    description: Site-wide search entry point.
+    memory:
+      - There is no `role="search"` landmark on the page. The field itself is an
+        `input[type="search"]` carrying `role="combobox"`, and it is the only
+        address for search.
+      - Six inputs exist and one is visible, so an unfiltered input query
+        returns five elements that cannot be typed into.
+    properties:
+      - name: search_placeholder
+        extract: attr=aria-label
+
+  - name: PageBanner
+    selector: 'div[role="banner"]'
+    description: Masthead region.
+    memory:
+      - The banner region measures zero and is not visible, though it matches.
+        Filter by visibility before treating it as a rendered landmark.
+
+  - name: MainRegion
+    selector: 'div[role="main"]'
+    description: The route's primary content column.
+
+  - name: ComplementaryRegion
+    selector: 'div[role="complementary"]'
+    description: Secondary column beside the main content.
