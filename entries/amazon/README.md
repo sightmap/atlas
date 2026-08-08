@@ -7,7 +7,7 @@ description: US marketplace — search, product detail, best-seller charts, and 
 categories: [commerce]
 author: chiplay
 created: 2026-08-06
-updated: 2026-08-06
+updated: 2026-08-08
 last_verified: 2026-08-06
 cli_version: 0.18.0
 spec_version: 1
@@ -32,7 +32,7 @@ The US marketplace, mapped as a signed-out shopper.
 `GlobalNav`, `KeyboardShortcutMenu`, and `PageRoot` are global. All five views
 report `0 orphaned` coverage, with every selector `sel-probe`d on 2026-08-06.
 
-## What bites
+## Hazards
 
 **The 404 has no text at all.** `document.body.innerText` is the empty string.
 The apology is the `alt` attribute of an image, the three links have image
