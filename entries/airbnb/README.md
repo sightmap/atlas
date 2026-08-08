@@ -7,7 +7,7 @@ description: Stay search with its live map, listing pages built from named secti
 categories: [travel]
 author: chiplay
 created: 2026-08-07
-updated: 2026-08-07
+updated: 2026-08-08
 last_verified: 2026-08-07
 cli_version: 0.18.0
 spec_version: 1
@@ -17,10 +17,9 @@ auth: none
 
 # Airbnb
 
-Stay search and listings, mapped as a signed-out visitor. The one travel entry in
-this atlas, and structurally unlike the commerce entries: a listing is a document
-of named sections rather than a product with attributes, and search is paired
-with a live map.
+Stay search and listings, mapped as a signed-out visitor. A listing is a
+document of named sections rather than a product with attributes, and search is
+paired with a live map.
 
 ## Coverage
 
@@ -37,7 +36,7 @@ with a live map.
 are global. All five views report `0 orphaned` coverage, with every selector
 `sel-probe`d on 2026-08-07.
 
-## What bites
+## Hazards
 
 **Four naming conventions, each covering a different part of the site.**
 Kebab-case testids (`listing-card-title`, `little-search`) name interactive
@@ -70,16 +69,12 @@ once toggled, so a selector for the unsaved form stops matching after a save.
 carry `data-testid="linaria-injector"` as style injection points. Nothing on this
 site should be selected by class.
 
-## The 404 is the good example
+## The 404
 
 An unmatched path redirects to `/404`, the title reads "404 Page Not Found -
 Airbnb", and the body spells out the error code. Path, title, and text all agree,
 so any one of the three detects it. The page also drops the React root entirely,
 which makes the absence of `#react-application` a fourth independent signal.
-
-Worth comparing against the other entries in this atlas, where Amazon's 404 has
-no text at all, Vuori's has an empty document title, Nike's merchandises real
-products, and eBay's says "We looked everywhere" without a code.
 
 ## Known gaps
 
