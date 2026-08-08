@@ -3,7 +3,7 @@ name: Zillow
 slug: zillow
 site_url: https://www.zillow.com/
 domains: [zillow.com, www.zillow.com]
-description: Zillow's signed-in landing page — search bar, top navigation, and the carousel of recommended homes.
+description: Zillow mapped signed in — landing page, search results, listing detail, saved homes and the 404, with the three incompatible card conventions between them.
 categories: [commerce]
 author: chiplay
 created: 2026-08-08
@@ -17,59 +17,75 @@ auth: personal-account
 
 # Zillow
 
-One view: the signed-in landing page. 9 components, every selector counted
-against the live page.
+Five views: the signed-in landing page, search results, a listing, saved homes,
+and the 404. 59 components and 4 requests, every selector counted on the route
+that declares it.
 
-Only the landing page is mapped. Listing detail pages carry home addresses,
-owner-adjacent detail, and agent phone numbers, and mapping them would mean
-handling a large amount of personal data about people who are not the account
-holder. That is a deliberate boundary, not an omission.
+## Personal data
+
+An earlier version of this entry stopped at the landing page, because listing
+pages carry home addresses and agent contact details. Listing detail is mapped
+here, under a narrower rule that fits the rest of the atlas: selectors and what
+they mean are recorded, values are not. The agent block is declared as
+structure with an explicit note that everything inside it is a named person's
+contact details. No address, price, phone number or agent name appears anywhere
+in the corpus, and the one listing URL present is a public for-sale listing.
 
 ## Why this is `auth: personal-account`
 
-The carousel on this page is a set of homes recommended to the account. It is
-mapped as structure and nothing inside it is recorded.
+The landing carousel is a set of homes recommended to the account, and saved
+homes is the account's own list. Both are mapped as structure and neither is
+recorded.
 
 Only the author can re-verify this entry. `last_verified` means the author
 re-checked with their own account; CI cannot, and neither can a reviewer.
 
-There are no screenshots. Every frame of this page shows real homes.
+There are no screenshots. Every frame of every route shows real homes.
 
 ## What bites
 
-**A prefix selector double-counts here.** `[data-testid^="home-rec-card-"]`
-matches sixteen elements, not eight, because `home-rec-card-anchor-N` shares the
-prefix with `home-rec-card-N`. Excluding the anchors is what gets you the card
-count.
+**Three routes, three card conventions.** Landing recommendations are
+`home-rec-card-N`, search results are `property-card`, saved homes are
+`PropertyListCard-wrapper`. No card selector works across all three — and on a
+listing page `property-card` matches five *other* homes, the similar-homes rail,
+not the listing being viewed.
 
-**The anchor is a sibling of its card, not a child.** Scoping the anchor inside
-the card matches nothing — which is the other half of why the shared prefix is
-confusing.
+**The two facts you want on a listing have no test id.** Nothing matches
+address at all, and `price` matches only history-table cells and a filter
+button. Read them from the `h1` and the document title.
 
-**Cards carry indexed test ids**, `home-rec-card-0` upward, so no fixed test id
-addresses a card. Only the prefix is stable.
+**`data-price-row` is not a row.** It is a `span` holding one price. The real
+row is a `tr` with no test id, so `data-price-row`, `price-money-cell` and
+`date-info` are three flat lists that have to be zipped by index.
 
-**There is no `main` element.** A query for `main` matches nothing; the top nav
-and the carousel are the landmarks.
+**Half the page renders twice.** `bed-bath-sqft-text__container` matches six for
+three facts, once inline and once in the sticky bar, and the media tab strip
+ships two copies of itself. `footer` matches two on search results and three on
+a listing.
 
-**Badge counts overstate.** `[data-testid="property-card-badge"]` matches eleven
-against eight cards, because three sit outside the carousel. Scoped to a card
-there is exactly one each.
+**The search bar is on the landing page only.** Search results, listing detail,
+saved homes and the 404 have none, so its absence is not a failed load.
 
-**Three inputs, one visible.** Scope the search field to the search-bar
-container rather than querying inputs globally.
+**A sign-in control does not mean signed out.** `reg-login` renders on search
+results and on the 404 in a signed-in session.
 
-**Card links embed a street address.** The anchor href is
-`/homedetails/:addressSlug`, and the slug is the address of a real home. The
-property naming that address is declared because naming what a selector yields
-is allowed, but the value is personal data about a third party and should be
-treated as such.
+**Search filters are path segments, not query parameters.** `for_sale`,
+`fore_lt` and `1_open` stack into the path and the location ends in `_rb`, so a
+search is composed as a URL. The list holds nine cards whatever the heading
+claims, and pages rather than scrolls.
+
+**The 404's title is the empty string** — the only route where that is true, and
+the cheapest test for it. Its `h1` reads "Uh oh, something broke."
 
 ## Coverage
 
-9 selectors counted on the route that declares them, all matching. One was
-wrong on the first pass and caught before commit — the card anchor, scoped as a
-child of the card it belongs to, matched nothing.
+All 59 selectors counted on their declaring route: listing 24, search 15, saved
+10, landing 6, 404 2, plus the globals. Two mistakes were caught this way and
+fixed — the price-history cells are not descendants of `data-price-row`, and the
+search bar is not global. Two earlier claims were corrected against a second
+load: the landing carousel's card count varies by session, and so does the badge
+overcount.
 
-No requests are recorded. `sightmap sel-probe` cannot attach to the browser this
-was authored in, so matches were counted in-page instead.
+`sightmap sel-probe` cannot attach to the browser this was authored in, so
+matches were counted in-page instead. Requests were read from the page's own
+Resource Timing entries.
