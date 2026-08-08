@@ -166,8 +166,15 @@ const SCREENSHOT_NAME = /^(\d{2})-[a-z0-9][a-z0-9-]*\.(png|webp)$/;
 {
   const problems = [];
   const shotsDir = join(entryDir, "screenshots");
+  // docs/SPEC.md: a signed-in entry may ship no screenshots at all. Every frame
+  // of one carries account chrome, and the rule there is to drop the shot rather
+  // than retouch it — so requiring one would force the doctored screenshot the
+  // spec forbids. Screenshots that ARE present still face every rule below.
+  const screenshotsOptional = fm?.auth === "personal-account";
   if (!existsSync(shotsDir)) {
-    problems.push("screenshots/ directory is missing (1-5 screenshots required)");
+    if (!screenshotsOptional) {
+      problems.push("screenshots/ directory is missing (1-5 screenshots required)");
+    }
   } else {
     const files = readdirSync(shotsDir).filter((f) => !f.startsWith("."));
     if (files.length < 1 || files.length > 5) {
