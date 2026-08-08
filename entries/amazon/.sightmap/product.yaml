@@ -6,23 +6,10 @@ views:
     url: https://www.amazon.com/dp/B08L5NP6NG
     description: Product page — title, image block, price, buy box, and the feature-slot body.
     memory:
-      - The page is assembled from slots whose ids end `_feature_div`. There were
-        541 of them on the article mapped here and 501 rendered empty, so the
-        overwhelming majority of the ids on this page match an element that shows
-        nothing. Presence of a slot means the template reserved it, not that it
-        has content.
-      - Ids are duplicated, and this is the trap most likely to break an agent.
-        Amazon renders more than one buy-box variant and hides all but one, so
-        `#add-to-cart-button` and `#buy-now-button` each match twice and
-        `#availability` matches three times. Every duplicate observed here sits
-        inside `#buybox`, and the hidden ones measure 0x0. Filter by visibility
-        rather than trusting `querySelector`.
+      - Ids ending `_feature_div` are template slots; most render empty. Presence
+        is not content.
       - The ASIN in the path is the whole address. `/dp/:asin` with no other
-        segments or query serves the same page, and it is the id search results
-        already carry.
-      - The three-column layout (`#leftCol` images, `#centerCol` facts,
-        `#rightCol` buy box) is stable across article types even as the feature
-        slots inside them change completely.
+        segments or query serves the same page.
     components:
       - name: ProductRoot
         selector: '#dp-container'
@@ -49,8 +36,8 @@ views:
               - name: brand
                 extract: text
             memory:
-              - Links to the brand's store. Absent on articles with no brand
-                association.
+              - Absent on articles with no brand association, so a miss here is
+                not a failure.
           - name: ReviewSummary
             selector: '#averageCustomerReviews'
             properties:
@@ -62,31 +49,25 @@ views:
               - name: price
                 extract: text
             memory:
-              - The center-column price is `#apex_desktop`. The id that reads like
-                the price slot, `#corePrice_feature_div`, is not here — it is the
-                buy box's per-offer price and matches three times.
+              - The id that reads like the price slot, `#corePrice_feature_div`,
+                is not in the center column — it is the buy box's per-offer
+                price, once per accordion row.
 
       - name: BuyBox
         selector: '#buybox'
         memory:
-          - Holds every duplicate id on the page. Scope to the visible descendant
-            rather than matching the ids globally.
+          - Every duplicated id on the page is in here. Scope to the visible
+            descendant rather than matching the ids globally.
         children:
           - name: Availability
             selector: '#availability'
             properties:
               - name: availability
                 extract: text
-            memory:
-              - Three of these exist inside the buy box and two are hidden.
           - name: AddToCartButton
             selector: '#add-to-cart-button'
-            memory:
-              - Two of these exist, one visible and one 0x0.
           - name: BuyNowButton
             selector: '#buy-now-button'
-            memory:
-              - Two of these exist, one visible and one 0x0.
 
       - name: RightColumn
         selector: '#rightCol'
@@ -97,22 +78,17 @@ views:
           - name: sentinel_id
             extract: attr=id
         memory:
-          - Fourteen one-pixel divs sit after the page root as siblings of it,
-            each holding nothing. They are placeholders that scripts fill in
-            later, and they inflate any count of body-level structure.
-          - One of them is `#add-to-cart-btn`, a third id in the add-to-cart
-            family alongside the two `#add-to-cart-button` elements in the buy
-            box. It is an empty placeholder and not a control.
+          - The body-level divs after the page root are one-pixel placeholders
+            holding nothing, and they inflate any count of body-level structure.
+          - One of them is `#add-to-cart-btn`, which reads like the buy-box
+            control and is an empty placeholder. The control is
+            `#add-to-cart-button`.
 
       - name: FeatureSlot
         selector: '[id$="_feature_div"]'
         properties:
           - name: slot_id
             extract: attr=id
-        memory:
-          - Mapped as one component because there are hundreds and their names
-            are per-article. `slot_id` tells you which slot you are looking at;
-            most of them are empty on any given page.
 
     requests:
       - name: CartItems
@@ -130,7 +106,6 @@ views:
         method: POST
         description: Fills out the review section below the fold once it is scrolled toward.
         memory:
-          - Eight reviews are already in the document, so the section is not
-            empty before this resolves — it is short. Counting what is on the
-            page is therefore not a count of the product's reviews; the total is
-            in the rating summary near the title.
+          - A few reviews ship in the initial HTML, so before this resolves the
+            section is short rather than empty. Counting what is on the page is
+            not the review total — that is in the rating summary near the title.
