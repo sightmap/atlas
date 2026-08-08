@@ -115,8 +115,8 @@
       "description": "How the map was authored."
     },
     "auth": {
-      "enum": ["none", "demo-account", "self-hosted"],
-      "description": "Access model of the mapped surfaces (see docs/POLICY.md)."
+      "enum": ["none", "demo-account", "self-hosted", "personal-account"],
+      "description": "Access model of the mapped surfaces (see docs/POLICY.md). personal-account means the mapper signed in with an account of their own; such entries carry extra obligations and cannot be re-verified by anyone without their own account."
     }
   }
 }

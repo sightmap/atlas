@@ -45,7 +45,7 @@ last_verified: 2026-08-05       # last date selectors were probed against the li
 cli_version: 0.1.0              # sightmap CLI used
 spec_version: 1                 # sightmap spec version (must match .sightmap/config.yaml)
 method: browser                 # browser | hybrid
-auth: none                      # none | demo-account | self-hosted  (see POLICY.md)
+auth: none                      # none | demo-account | self-hosted | personal-account  (see POLICY.md)
 ---
 ```
 
@@ -65,6 +65,35 @@ Body below the front matter is free-form: coverage notes, quirks, known gaps. No
 - `screenshots/NN-<kebab-name>.png`, NN starting at `01`; 1–5 images per entry.
 - ≤300 KB each, width 1200–2000 px, PNG or WebP.
 - Public, non-sensitive screens only; no personal data, no real customer records (see POLICY.md). Demo/sandbox data must look like demo data.
+
+## Signed-in entries (`auth: personal-account`)
+
+Most products worth delegating to an agent are behind a login, so a map of only
+public pages cannot describe them. `auth: personal-account` covers an entry the
+mapper authored while signed in with an account of their own.
+
+The map documents the product's structure. It must not document the account.
+
+- **The mapper's identity never ships.** No real name, email, handle, avatar,
+  postal address, phone number, or payment detail — in screenshots, YAML,
+  memory notes, or property samples.
+- **Nor does the account's contents.** Order history, watch and listening
+  history, saved items, playlists, direct messages, contacts, friend lists,
+  notifications, and balances are all the account, not the product.
+- **`properties` name what a selector extracts, never what it extracted.** A
+  property is `order_total`, not `$142.68`.
+- **Prefer frames with no account chrome**, and drop a screenshot rather than
+  edit one. A screenshot-less entry is always acceptable; a doctored one is not.
+- **Only the author can re-verify it.** `last_verified` on these entries means
+  the author re-checked with their own account. CI cannot, and neither can a
+  reviewer. Say so in the README body.
+- **A challenge is a stop sign.** A person signing into their own account and
+  clicking through their own product is ordinary use. Automating past a bot
+  check or CAPTCHA is not, and is still forbidden however the session was
+  obtained.
+
+Nothing here weakens the rules above it: `auth: personal-account` widens what
+may be mapped, not what may be published.
 
 ## index.json (generated)
 
