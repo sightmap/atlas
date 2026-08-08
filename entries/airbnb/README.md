@@ -8,7 +8,7 @@ categories: [travel]
 author: chiplay
 created: 2026-08-07
 updated: 2026-08-08
-last_verified: 2026-08-07
+last_verified: 2026-08-08
 cli_version: 0.18.0
 spec_version: 1
 method: browser
@@ -32,9 +32,9 @@ paired with a live map.
 | `NotFound` | `/404` | Error page, reached by redirect |
 
 `SkipLinks`, `AppRoot`, `PageHeader`, `PageMain`, `PageFooter`, `SearchHeader`,
-`HeaderProfileMenu`, `TabListWrapper`, `ContentScroller`, and `ModalContainer`
-are global. All five views report `0 orphaned` coverage, with every selector
-`sel-probe`d on 2026-08-07.
+`HeaderProfileMenu`, `TabListWrapper`, and `ContentScroller` are global, and not
+one of them appears on all five views. All five views report `0 orphaned`
+coverage, with every selector `sel-probe`d against every view on 2026-08-08.
 
 ## Hazards
 

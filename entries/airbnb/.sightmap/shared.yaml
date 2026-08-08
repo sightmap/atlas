@@ -87,11 +87,6 @@ components:
       - A horizontal scroll container reused for card carousels and image
         galleries, so finding one says nothing about what it holds.
 
-  - name: ModalContainer
-    selector: '[data-testid="modal-container"]'
-    memory:
-      - The dialog host. Present on browse routes before anything opens it.
-
 requests:
   - name: PersistedGraphQlOperation
     route: /api/v3/*/*
