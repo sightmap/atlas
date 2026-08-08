@@ -60,6 +60,36 @@ Body below the front matter is free-form: coverage notes, quirks, known gaps. No
 - No `source:` / `dependencies:` keys — atlas maps are observed, not source-derived.
 - Selectors verified against the live site at authoring time (`sightmap sel-probe`); record the date in `last_verified`.
 
+## Memory notes (reviewed)
+
+`memory` is the only field written for the agent rather than about the page. A
+sightmap-aware browsing tool surfaces these as guide bullets, so the whole set
+loads before the agent acts, competing with the task for room in the context
+window.
+
+Write the rule. Leave out the investigation that found it.
+
+- **Apply the delete test.** If an agent would do the same thing having never
+  read the note, the note does not belong in the entry. The common failure is
+  a note restating what the component's name and selector already say.
+- **State the finding, drop the evidence.** "Ids ending `_feature_div` are
+  template slots; most render empty" is the rule. How many were empty on the
+  page you happened to map is how you learned it, and it belongs in the PR
+  body if anywhere.
+- **Include the fix.** A note saying a selector is unreliable leaves the agent
+  stuck. Name the working approach: filter by visibility, prefer the module
+  prefix, read `alt_text`.
+- **One quirk per note.** Two unrelated facts in one note means the agent that
+  needs the second still pays for the first.
+- **Record what the page hides.** Memory is for what is invisible, surprising,
+  or wrong-looking-but-correct — a selector that resolves to the wrong thing, a
+  route that serves two different pages, an id that looks stable and is not, a
+  page with no `h1`. Anything a fresh look would tell you does not need a note.
+
+An entry with no memory notes records that something exists but not how to work
+it. An entry whose notes read like a report charges every agent that loads it
+for detail it cannot use.
+
 ## Screenshot rules (enforced)
 
 - `screenshots/NN-<kebab-name>.png`, NN starting at `01`; 1–5 images per entry.
