@@ -16,6 +16,37 @@ views:
         writing the selector.
       - A merged pull request still serves this page. Nothing about the route
         distinguishes open from merged; the state badge in the header does.
+    requests:
+      - name: TabCounts
+        route: /:owner/:repo/pull/:number/page_data/tab_counts
+        method: GET
+        description: The commit, check, and changed-file counts on the sub-nav, fetched after the document.
+
+      - name: Diffstat
+        route: /:owner/:repo/pull/:number/page_data/diffstat
+        method: GET
+        description: Backs the addition and neutral diffstat testids in the header.
+
+      - name: PartialsLinks
+        route: '/:owner/:repo/pull/:number/partials/links?has_github_issues=*'
+        method: GET
+        description: Linked issues and projects for this pull request, rendered as a markup fragment.
+
+      - name: CommitBadges
+        route: /commits/badges
+        method: POST
+        description: Verification and signing badges for the commits listed on the conversation tab. Posted to the site root, not under the repository.
+
+      - name: ChecksStatusesRollups
+        route: /:owner/:repo/commits/checks-statuses-rollups
+        method: POST
+        description: Rolled-up check status per commit, driving the green or red mark beside each one.
+
+      - name: ReviewThreadDiffLines
+        route: /:owner/:repo/pull/:number/review_thread_syntax_highlighted_diff_lines
+        method: POST
+        description: Highlighted diff context for inline review threads, fetched even when the diff tab is not open.
+
     components:
       - name: PullNav
         selector: 'nav[aria-label="Pull request navigation tabs"]'
@@ -28,25 +59,3 @@ views:
 
       - name: NeutralDiffstat
         selector: '[data-testid="neutral diffstat"]'
-
-  - name: NotFound
-    route: /**
-    url: https://github.com/sightmap/sightmap/no-such-page-xyz-123
-    description: 404 page, served with a real 404 status.
-    memory:
-      - Returns an actual 404 rather than a 200 with an error body, which is
-        rarer than it should be and means the status code can be trusted here.
-      - The page has no `h1` at all. Anything keying "did I land somewhere
-        real" on the presence of a heading will read this page as a loading
-        state. Test for the 404 illustration instead.
-    components:
-      - name: NotFoundMain
-        selector: 'main'
-        properties:
-          - name: message
-            extract: text
-
-      - name: NotFoundArt
-        selector: 'img[alt*="404"]'
-        memory:
-          - The only positive signal on the page that it is a 404.

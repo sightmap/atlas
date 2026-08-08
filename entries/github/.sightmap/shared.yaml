@@ -18,18 +18,43 @@ memory:
     `^=` matches the start of the whole class attribute, so it silently depends
     on that class happening to be listed first.
 
+requests:
+  - name: Telemetry
+    route: /github/collect
+    method: POST
+    description: Analytics beacon fired on every route, signed out included. Sent to collector.github.com, not to github.com.
+
+  - name: BrowserStats
+    route: /_private/browser/stats
+    method: POST
+    description: Client performance beacon fired on every route. Sent to api.github.com, not to github.com.
+
+  - name: BudgetThresholdBanner
+    route: '/in-product-messaging/budget-threshold-banner?organization=*'
+    method: GET
+    description: In-product messaging banner requested on every repository-scoped route.
+
 components:
-  - name: GlobalHeader
-    selector: 'nav[aria-label="Global"]'
+  - name: HeaderWrapper
+    selector: '.js-header-wrapper'
     memory:
-      - Present on every signed-out route including the 404, and the one
-        component in this corpus that does not survive a session. Signed in,
-        this matches nothing — the header is replaced by
-        `header[aria-label="Global navigation menu"]`, and a breadcrumb nav
-        appears beside it that is absent signed out. Verified in a real
-        signed-in browser — every other selector in this corpus matched
-        identically in both states, so this is the only place the signed-out
-        assumption changes what you get.
+      - The whole top-of-page chrome band, including the skip link, which sits
+        outside the header element itself.
+    children:
+      - name: GlobalHeader
+        selector: 'nav[aria-label="Global"]'
+        memory:
+          - Present on every signed-out route including the 404, and the one
+            component in this corpus that does not survive a session. Signed in,
+            this matches nothing — the header is replaced by
+            `header[aria-label="Global navigation menu"]`, and a breadcrumb nav
+            appears beside it that is absent signed out. Verified in a real
+            signed-in browser — every other selector in this corpus matched
+            identically in both states, so this is the only place the signed-out
+            assumption changes what you get.
+
+      - name: SkipLink
+        selector: 'a[href="#start-of-content"]'
 
   - name: SkipToContent
     selector: '#start-of-content'
@@ -38,7 +63,19 @@ components:
         boundary when a page's real landmark differs by frontend.
 
   - name: GlobalFooter
-    selector: 'nav[aria-label="Footer"]'
+    selector: 'footer[role="contentinfo"]'
+    children:
+      - name: FooterNav
+        selector: 'nav[aria-label="Footer"]'
+
+  - name: AjaxErrorFlash
+    selector: '#ajax-error-message'
+
+  - name: ScreenReaderNotice
+    selector: '[id^="js-global-screen-reader-notice"]'
+
+  - name: ScreenReaderAnnouncement
+    selector: '#screenReaderAnnouncementDiv'
 
   - name: RepoPjaxContainer
     selector: '#js-repo-pjax-container'
@@ -47,12 +84,18 @@ components:
         which the React pages no longer use, but the id survived the migration
         and is currently the most reliable "am I on a repo page" test.
 
-  - name: RepoNav
-    selector: 'nav[aria-label="Repository"]'
+  - name: RepoHeader
+    selector: '#repository-container-header'
     properties:
-      - name: tabs
+      - name: header_text
         extract: text
-    memory:
-      - The Code / Issues / Pull requests / Discussions tab bar. Its labels
-        carry counts, so reading this one element gives the open issue and PR
-        totals without visiting either list.
+    children:
+      - name: RepoNav
+        selector: 'nav[aria-label="Repository"]'
+        properties:
+          - name: tabs
+            extract: text
+        memory:
+          - The Code / Issues / Pull requests / Discussions tab bar. Its labels
+            carry counts, so reading this one element gives the open issue and PR
+            totals without visiting either list.

@@ -12,13 +12,38 @@ views:
       - The rendered README is `article.markdown-body`, which is also the
         rendered file on a blob page. It is the same component in both places,
         so one selector reads rendered Markdown anywhere on the site.
-    components:
-      - name: RepoHeader
-        selector: '#repository-container-header'
-        properties:
-          - name: header_text
-            extract: text
+    requests:
+      - name: LatestCommit
+        route: /:owner/:repo/latest-commit
+        method: GET
+        description: The commit strip above the file table, fetched after the document rather than rendered into it.
 
+      - name: TreeCommitInfo
+        route: /:owner/:repo/tree-commit-info
+        method: GET
+        description: Per-file commit message and date for every row of the file table.
+
+      - name: OverviewFiles
+        route: /:owner/:repo/overview-files/:ref
+        method: GET
+        description: The rendered README and the other overview documents for the default branch.
+
+      - name: Sidebar
+        route: /:owner/:repo/_sidebar
+        method: GET
+        description: About box, topics, languages, and the releases and packages counts.
+
+      - name: BranchAndTagCount
+        route: /:owner/:repo/branch-and-tag-count
+        method: GET
+        description: The two counts shown beside the branch picker.
+
+      - name: RecentlyTouchedBranches
+        route: /:owner/:repo/recently-touched-branches
+        method: GET
+        description: Feeds the recently pushed branch prompt. Returns an empty result signed out.
+
+    components:
       - name: FileTreeNav
         selector: 'nav[aria-label="Repository files"]'
         memory:
@@ -36,9 +61,9 @@ views:
         properties:
           - name: commit_text
             extract: text
-        children:
-          - name: LatestCommitDetails
-            selector: '[data-testid="latest-commit-details"]'
+
+      - name: LatestCommitDetails
+        selector: '[data-testid="latest-commit-details"]'
 
       - name: ViewAllFilesRow
         selector: '[data-testid="view-all-files-row"]'
@@ -62,6 +87,17 @@ views:
         general "the file content" hook, only "the rendered document".
       - The `[data-testid="latest-commit"]` strip appears here too, scoped to
         the file rather than the repository.
+    requests:
+      - name: FileLatestCommit
+        route: /:owner/:repo/latest-commit/:ref/**
+        method: GET
+        description: The commit strip for this one file, keyed by path rather than by repository.
+
+      - name: DeferredMetadata
+        route: /:owner/:repo/deferred-metadata/:ref/**
+        method: GET
+        description: Blame, history, and symbol metadata for the open file, fetched after the document.
+
     components:
       - name: StickyHeader
         selector: '#StickyHeader'

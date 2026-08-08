@@ -14,6 +14,12 @@ views:
         that matches here matches there. Check for `.js-issue-row` before
         assuming which one you are on.
       - The list is server-rendered, so the rows are in the initial document.
+    requests:
+      - name: ReviewDecisions
+        route: /pull_request_review_decisions
+        method: POST
+        description: Review state for the rows on screen, posted as one batch after the document. The only fetch this view makes.
+
     components:
       - name: PullRow
         selector: '.js-issue-row'
@@ -53,6 +59,17 @@ views:
         (`authors-`, `labels-`, `projects-`, `milestones-`, `assignees-`,
         `issue-types-`), which is a more stable way to enumerate the available
         facets than reading the filter bar's text.
+    requests:
+      - name: PersistedGraphQl
+        route: '/_graphql?body=*'
+        method: GET
+        description: Persisted GraphQL over GET, with the operation name and query hash in the body query parameter rather than in a POST payload.
+
+      - name: IssuesViewer
+        route: '/issues/viewer?queryId=*'
+        method: GET
+        description: Viewer state for the issue list. Fires signed out too, keyed by an opaque query id.
+
     components:
       - name: IssueSection
         selector: 'section[aria-label="All issues"]'

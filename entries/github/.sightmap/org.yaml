@@ -16,12 +16,37 @@ views:
       - Only public repositories appear when signed out, so a count read here
         is a count of public repositories and not of the organization's
         repositories.
+    requests:
+      - name: TabCounts
+        route: '/users/:org/tab_counts?repo=*'
+        method: GET
+        description: The numbers on the Repositories, Projects, and People tabs. Served from the users path even for an organization.
+
+      - name: ParticipationSparkline
+        route: '/:owner/:repo/graphs/participation?type=sparkline*'
+        method: GET
+        description: One call per pinned repository, drawing that repository's commit sparkline.
+
+      - name: SetupBudgetBanner
+        route: '/in-product-messaging/tbb-setup-budget-banner?organization=*'
+        method: GET
+        description: Organization billing prompt. This route replaces the repository-scoped banner on the profile.
+
     components:
-      - name: OrgNav
-        selector: 'nav[aria-label="Organization"]'
+      - name: OrgHeader
+        selector: 'header.orghead'
         properties:
-          - name: tabs
+          - name: header_text
             extract: text
+        children:
+          - name: OrgNav
+            selector: 'nav[aria-label="Organization"]'
+            properties:
+              - name: tabs
+                extract: text
+
+      - name: OrgSidebar
+        selector: 'div[data-view-component="true"].col-md-3'
 
       - name: PinnedItems
         selector: '.js-pinned-items-reorder-container'
@@ -32,7 +57,7 @@ views:
         selector: '#org-repositories'
         children:
           - name: RepoLink
-            selector: 'a[itemprop="name codeRepository"]'
+            selector: 'a[data-hovercard-type="repository"]'
             properties:
               - name: repo_name
                 extract: text
