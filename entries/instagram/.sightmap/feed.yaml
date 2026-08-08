@@ -1,0 +1,59 @@
+version: 1
+
+views:
+  - name: Feed
+    route: /
+    url: https://www.instagram.com/
+    description: The signed-in home feed — a column of posts, each with its action row.
+    memory:
+      - This page carries no `data-testid` anywhere and no `h1` at all, so
+        neither test ids nor headings can address anything here.
+      - Class names are Meta's atomic CSS. 451 distinct classes matching a
+        hashed pattern were counted on one render, and none of them describes
+        what an element is. Never select on a class here.
+      - What remains addressable is semantic elements and labelled icons.
+        `article` bounds a post and `svg[aria-label="…"]` names every action,
+        and between them they cover the page.
+      - The single `nav` element is the corporate footer — About, Help, Blog,
+        Developers — and not the app navigation. It is not inside the
+        `contentinfo` footer either, so neither `nav` nor a scope under the
+        footer addresses anything an agent wants to click.
+      - Every post in this feed is chosen for the account, and its content
+        belongs to other people. The map bounds the post and its controls; it
+        records nothing about who posted or what was posted.
+    components:
+      - name: FeedMain
+        selector: 'main[role="main"]'
+        description: The feed column.
+        children:
+          - name: Post
+            selector: 'article'
+            description: One post, including its media and action row.
+            memory:
+              - A post has no `header` element, so the author strip cannot be
+                addressed that way.
+              - Not every post carries a `time` element. Three of four did on
+                the render mapped here, so a timestamp is optional rather than
+                guaranteed.
+              - Post permalinks outnumber posts, since a post can carry more
+                than one `/p/` link. Count articles to count posts.
+            children:
+              - name: PostLink
+                selector: 'a[href^="/p/"]'
+                description: Permalink to the post's own page.
+                properties:
+                  - name: post_href
+                    extract: attr=href
+              - name: PostTime
+                selector: 'time'
+                properties:
+                  - name: posted_at
+                    extract: attr=datetime
+              - name: LikeButton
+                selector: 'svg[aria-label="Like"]'
+              - name: CommentButton
+                selector: 'svg[aria-label="Comment"]'
+              - name: ShareButton
+                selector: 'svg[aria-label="Share"]'
+              - name: SaveButton
+                selector: 'svg[aria-label="Save"]'

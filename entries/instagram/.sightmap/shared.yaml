@@ -1,0 +1,27 @@
+version: 1
+
+components:
+  - name: HomeNavLink
+    selector: 'svg[aria-label="Home"]'
+    description: Primary navigation entry for the feed.
+    memory:
+      - The primary navigation has no landmark. Home, Search, Reels and Messages
+        sit in a plain div stack with no `nav` element and no
+        `role="navigation"`, so the only address for them is the labelled icon.
+  - name: SearchNavButton
+    selector: 'svg[aria-label="Search"]'
+  - name: ReelsNavLink
+    selector: 'svg[aria-label="Reels"]'
+  - name: MessagesNavLink
+    selector: 'svg[aria-label="Messages"]'
+  - name: NotificationsNavButton
+    selector: 'svg[aria-label="Notifications"]'
+    description: Opens the account's activity panel. Its contents are account state.
+  - name: NewPostButton
+    selector: 'svg[aria-label="New post"]'
+  - name: SettingsButton
+    selector: 'svg[aria-label="Settings"]'
+
+  - name: SiteFooter
+    selector: 'footer[role="contentinfo"]'
+    description: Page footer.
