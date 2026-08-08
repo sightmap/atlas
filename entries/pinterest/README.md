@@ -3,7 +3,7 @@ name: Pinterest
 slug: pinterest
 site_url: https://www.pinterest.com/
 domains: [pinterest.com, www.pinterest.com]
-description: Pinterest's pin detail page, mapped signed in — closeup image, description, action bar, and the related-pin grid.
+description: Pinterest mapped signed in — home feed, search, board, pin detail, profile and what a dead path renders instead of a 404.
 categories: [social]
 author: chiplay
 created: 2026-08-08
@@ -17,56 +17,70 @@ auth: personal-account
 
 # Pinterest
 
-One view: a pin detail page. 19 components and 6 requests, every selector
-counted against the live page.
+Six views: home, search, board, pin detail, profile, and the path that resolves
+to nothing. 59 components and 12 requests, every selector counted on the route
+that declares it.
 
 ## Why this is `auth: personal-account`
 
-The related grid below a pin is assembled for the account, and the header
-carries the account's avatar and notification badge. Both are mapped as
-structure. No pin content, board, follow, or identity ships — the entry records
-that the containers exist and what shape they have.
+Every feed here is assembled for the account, and the header carries its avatar
+and notification badge. All of it is mapped as structure — the entry records
+that the containers exist and what shape they have, never what is in them.
 
 Only the author can re-verify this entry. `last_verified` means the author
 re-checked with their own account; CI cannot, and neither can a reviewer.
 
-There are no screenshots, because a pin page is other people's photographs and
-the account's own recommendations end to end.
+There are no screenshots: a Pinterest feed is other people's photographs end to
+end.
 
 ## What bites
 
-**There is no `h1` on this page.** Not an empty one — none at all. Heading-based
-route detection cannot work here. Test for `[data-test-id="pdp-container"]`.
+**Half the site does not render in a background tab.** Home and search ship
+their feeds inside the document and populate fine. Everything fetched
+afterwards does not: the profile body stays empty past thirteen seconds, a
+board's pin grid past thirty, the related grid on a pin past nineteen. The
+containers all render, which is what makes it dangerous — the page looks
+loaded and has no content. Foreground the tab, or navigate to a board from
+inside the app rather than by URL.
 
-**The 22 elements with `data-test-id="pin"` are not the pin you are looking
-at.** They are the related grid. The pin itself lives in the closeup container
-and carries no `pin` attribute, so the obvious selector returns 22 wrong answers
-and never the right one.
+**There is no 404.** A missing board redirects to the home feed at
+`/?show_error=true` and says nothing else, so an agent following a stale link
+reads home as the board. A missing user renders the same chrome-only page as a
+real profile — same title shape, same empty body, same test ids — so "no such
+account" and "did not render" are indistinguishable from the DOM.
 
-**The pin's own data never crosses the network.** It is rendered into the
-document; only the related grid is fetched afterwards. Waiting on a request
-before reading the pin waits for something that will not arrive.
+**The settle marker is gone.** `closeup-data-loaded` was present in an earlier
+build of the pin page and no longer exists. Nothing replaced it.
 
-**There is an explicit settle marker.** `[data-test-id="closeup-data-loaded"]`
-appears once the pin has rendered. Poll for it rather than guessing a delay.
+**`/resource/ApiResource/get/` is a proxy for the v3 REST API.** The real path
+and the exact field list ride inside the `data=` parameter as `options.url` and
+`options.data.fields`, so the request URL says nothing about what was asked
+for. Every `/resource/` call does carry `source_url=<path>`, which makes the
+issuing route readable — unusual, and useful.
 
-**Related cards are not uniform.** Of 22 observed, 21 carried an image, two were
-video, and only 17 had a footer or a more-actions button. Counts across the grid
-do not line up with the card count.
+**A hidden `fb.html` iframe posts account identifiers to Meta.** The query
+string on `facebook.com/tr/` carries email, first name, last name and country,
+hashed and also partially masked. A route to recognise and never a payload to
+read.
 
-**44 images carry `pin-missing-alt-text`**, so alt text is not a dependable
-description source on this page.
+**Card type is a test id, not an attribute.** Each card holds exactly one
+`pincard-<type>-with-link` or `-without-link`; `oneTap` marks a promoted card.
+The promoted share swings hard — 3 of 25 cards on one home render and 13 of 25
+on the next, and 14 of 18 on a search.
 
-**Every backend call is `/resource/:ResourceName/:verb/`** where the verb is
-`get`, `create` or `update`, and the arguments ride in a `data=` query parameter
-holding URL-encoded JSON. There is no REST path to read, and the related grid
-pages through a `bookmarks` cursor inside that JSON.
+**Two nested elements carry save-button test ids**, `pin-better-save-button`
+and `PinBetterSaveButton`, so a census counts one control twice. Two board
+controls carry their visible label as the test id: `Organize` and
+`More ideas`, spaces and capitals included.
 
 ## Coverage
 
-18 selectors counted on the route that declares them, all matching. One was
-mis-scoped on the first pass: the navigation icons sit in their own `nav`
-outside the header container, so scoping them under the header matched nothing.
+All 59 selectors counted on their declaring route: pin detail 15, board 13,
+search 8, home 6, plus the globals on each. Two scoping mistakes were caught
+this way and fixed — `board-tools` sits beside the board header rather than
+inside it, and the search refinement pills are a sibling of the results
+container rather than a descendant. The left rail turned out to have no test id
+or aria-label at all, so its entries are addressed individually.
 
 `sightmap sel-probe` cannot attach to the browser this was authored in, so
 matches were counted in-page instead.
