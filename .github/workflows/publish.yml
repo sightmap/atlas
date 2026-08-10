@@ -18,10 +18,6 @@
 # PAT with contents+PR write on sightmap/sightmap — see plan/IMPLEMENTATION.md
 # "Provisioning"). Without it the step logs a notice and exits 0 so forks and
 # pre-provisioning merges stay green.
-#
-# NOTE: gen-index requires the `stats` verb (sightmap/sightmap PR #167,
-# branch feat/stats-verb). Until that merges into the pinned ref, this
-# workflow fails at the "Regenerate index.json" step by design.
 
 name: publish
 
@@ -206,6 +202,8 @@ jobs:
                 '' \
                 '- `web/src/data/atlas/index.json`' \
                 '- `web/src/data/atlas/screenshots/<slug>/…`' \
+                '- `web/src/data/atlas/<slug>/.sightmap/…` (corpora)' \
+                '- `web/src/data/atlas/<slug>.md` (entry READMEs)' \
                 '' \
                 "Force-updated by the [sightmap/atlas publish workflow](https://github.com/sightmap/atlas/actions/workflows/publish.yml) on every atlas merge; this update is from atlas commit ${atlas_sha}." \
                 '' \

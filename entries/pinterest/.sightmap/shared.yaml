@@ -1,5 +1,10 @@
 version: 1
 
+memory:
+  - Every backend call goes through `/resource/:ResourceName/:verb/`, where
+    verb is get, create or update and the arguments ride in a `data=` query
+    parameter holding URL-encoded JSON. There is no REST path to read.
+
 requests:
   - name: Telemetry
     route: /resource/ApiSResource/create/
@@ -30,10 +35,6 @@ components:
   - name: SiteHeader
     selector: '[data-test-id="header"]'
     description: Fixed top bar — search, navigation icons, and account controls.
-    memory:
-      - Every backend call goes through `/resource/:ResourceName/:verb/`, where
-        verb is get, create or update and the arguments ride in a `data=` query
-        parameter holding URL-encoded JSON. There is no REST path to read.
     children:
       - name: SearchBox
         selector: '[data-test-id="search-box-input"]'
