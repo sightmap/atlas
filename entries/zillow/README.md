@@ -7,7 +7,7 @@ description: Zillow mapped signed in — landing page, search, listing detail, s
 categories: [commerce]
 author: chiplay
 created: 2026-08-08
-updated: 2026-08-08
+updated: 2026-08-10
 last_verified: 2026-08-08
 cli_version: 0.19.0
 spec_version: 1
@@ -40,7 +40,10 @@ recorded.
 Only the author can re-verify this entry. `last_verified` means the author
 re-checked with their own account; CI cannot, and neither can a reviewer.
 
-There are no screenshots. Every frame of every route shows real homes.
+Two screenshots ship — the landing page and search results — captured signed
+in. They show real listings: photographs, prices and street addresses of homes
+on the public market, published by Zillow and the listing brokerages named in
+the frame. Neither was retouched.
 
 ## What bites
 
