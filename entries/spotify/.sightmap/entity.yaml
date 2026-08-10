@@ -144,3 +144,57 @@ views:
       - name: ArtistGrid
         selector: '[data-testid="grid-container"]'
         description: Grid layout used by the discography sections.
+
+  - name: TrackDetail
+    route: /track/:trackId
+    url: https://open.spotify.com/track/2EK8rXsXlVz4ZYFscfhxHG
+    description: One song — header, action bar, the artist card, and shelves of the artist's other work.
+    memory:
+      - Container shape is what identifies the route. Album is `album-page`,
+        playlist is `playlist-page`, track is `track-page`, and artist has none
+        of them. Test the container, not the header.
+      - Most of this page is the artist, not the song. Below the header the
+        shelves read "Popular Releases by", "Fans also like" and "About the
+        artist", so a shelf here describes the artist and not the track.
+      - Signed out, this route renders a different build entirely —
+        `track-view`, `entity-play-button`, `track-artist-link-card`, and no
+        `track-page` at all. Nothing in this view matches a lapsed session,
+        which is a way to detect one.
+      - The recommendation list under the header reuses `tracklist-row` from
+        album and artist, so a row count here is recommendations rather than
+        anything about the song.
+    components:
+      - name: TrackPage
+        selector: '[data-testid="track-page"]'
+        description: The track container. Its presence is the route test.
+      - name: TrackTitle
+        selector: '[data-testid="entityTitle"]'
+        description: The song name.
+        properties:
+          - name: track_name
+            extract: text
+      - name: TrackActionBar
+        selector: '[data-testid="action-bar"]'
+        description: Play, save, download and more-options controls.
+        children:
+          - name: LyricsButton
+            selector: '[data-testid="lyrics-button"]'
+            description: Opens the lyrics panel. Present on this route only.
+      - name: RecommendedTrack
+        selector: '[data-testid="tracklist-row"]'
+        description: One row of the recommendations under the header.
+        children:
+          - name: RecommendedTrackLink
+            selector: '[data-testid="internal-track-link"]'
+            properties:
+              - name: track_title
+                extract: text
+      - name: TrackShelf
+        selector: '[data-testid="component-shelf"]'
+        description: A titled row of the artist's other releases.
+        children:
+          - name: TrackShelfHeader
+            selector: '[data-testid="rich-title-row-shelf-header"]'
+            properties:
+              - name: shelf_title
+                extract: text

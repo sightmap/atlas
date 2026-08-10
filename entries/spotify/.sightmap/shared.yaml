@@ -61,6 +61,8 @@ components:
       - This bar owns every `[data-testid="cover-art-image"]` on the page. An
         agent reaching for a page's artwork lands here and gets the playing
         track instead, so scope artwork queries inside the page's own container.
+      - It also owns `[data-testid="track"]`, which is an icon in its cover-art
+        button and never a track anywhere on the site. The name is a trap.
     children:
       - name: PlayerControls
         selector: '[data-testid="player-controls"]'
