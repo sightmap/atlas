@@ -111,7 +111,8 @@ What to expect:
 - A maintainer reviews for policy and quality. Maintainers may decline any
   entry for policy, quality, or legal-risk reasons (see
   [docs/POLICY.md](docs/POLICY.md)).
-- Never edit `index.json`. It is generated on merge.
+- Do not add `index.json` to a PR. It is generated on merge and vendored into
+  sightmap/sightmap, never committed here.
 
 ## The quality bar
 

@@ -18,7 +18,6 @@ entries/<slug>/
   screenshots/
     01-<name>.png …      # see screenshot rules
 removed.yaml             # tombstones; removed slugs may never be reused
-index.json               # GENERATED on merge — never edit by hand
 schema/entry.schema.json # JSON Schema for the front matter below
 ```
 
@@ -128,7 +127,10 @@ may be mapped, not what may be published.
 
 ## index.json (generated)
 
-Built on every merge to `main` by CI; consumed by sightmap.org/atlas and by `sightmap add`. Schema:
+Built on every merge to `main` by CI and vendored into sightmap/sightmap. It is
+not committed to this repo. sightmap.org/atlas and `sightmap atlas find|list`
+read the published copy at `https://sightmap.org/atlas/index.json`. To inspect
+one locally, run `node scripts/gen-index.mjs --out /tmp/index.json`. Schema:
 
 ```json
 {
