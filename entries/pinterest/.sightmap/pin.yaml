@@ -11,11 +11,11 @@ views:
       - The pin's own data is rendered into the document; only the related grid
         is fetched afterwards. Waiting for a network call before reading the pin
         waits for something that never comes.
-      - The 22 elements carrying `data-test-id="pin"` are the related grid, not
-        the pin being viewed. The pin itself is inside the closeup container and
+      - Elements carrying `data-test-id="pin"` are the related grid, not the
+        pin being viewed. The pin itself is inside the closeup container and
         carries no such attribute.
-      - 44 images on this page carry `pin-missing-alt-text`, so alt text is not
-        a dependable description source here.
+      - Most images carry `pin-missing-alt-text`, so alt text is not a
+        dependable description source here.
     requests:
       - name: RelatedModules
         route: /resource/RelatedModulesResource/get/
@@ -70,9 +70,9 @@ views:
             selector: '[data-test-id="pin"]'
             description: One card in the related grid.
             memory:
-              - Cards are not uniform. Of 22 observed, 21 carried an image and
-                two were video instead, and only 17 carried a footer or a
-                more-actions button. Iterate the cards and test each part rather
+              - Cards are not uniform — some carry a video where the image
+                would be, and the footer and more-actions button are present on
+                only some cards. Iterate the cards and test each part rather
                 than assuming a count matches the card count.
             children:
               - name: PinImage

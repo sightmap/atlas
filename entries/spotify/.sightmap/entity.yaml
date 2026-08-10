@@ -22,9 +22,8 @@ views:
         selector: '[data-testid="album-page"]'
         description: The album container. Everything about the album lives inside it.
         memory:
-          - Neither `cover-art-image` nor `entity-image` matches inside this
-            container, though both look like the artwork hook. The album's own
-            image is a plain `img` descendant here.
+          - The album's own artwork is a plain `img` descendant; no artwork
+            testid matches inside this container.
         children:
           - name: AlbumTitle
             selector: '[data-testid="entityTitle"]'
@@ -58,9 +57,8 @@ views:
             selector: '[data-testid="tracklist-row"]'
             description: One track. Repeats once per track on the album.
             memory:
-              - Per-row play buttons render on hover, so eleven rows yield
-                eleven play buttons of which only about seven are visible at
-                rest. Count rows, not play buttons.
+              - Per-row play buttons render on hover, so at rest only some are
+                in the DOM. Count rows, not play buttons.
             children:
               - name: TrackLink
                 selector: '[data-testid="internal-track-link"]'

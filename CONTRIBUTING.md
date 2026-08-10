@@ -124,8 +124,9 @@ Entries are held to the bar set for the seed entries
   non-obvious. The notes are the product.
 - **Requests documented** wherever traffic is observable.
 - **`last_verified` is the date you actually probed the selectors.** Be honest about it.
-- `sightmap validate` passes; `sightmap lint` passes, with any warnings
-  justified by a note in the README body.
+- `sightmap validate` passes; `sightmap lint` exits clean — CI requires a zero
+  exit. Where a lint rule misfires on a stable selector, rewrite the selector
+  to an equivalent form the rule accepts and say why in the README body.
 
 ## Updating or removing an entry
 
