@@ -17,7 +17,7 @@ auth: personal-account
 
 # YouTube
 
-Two views: the signed-in home feed and a watch page. 25 components, every
+Two views: the signed-in home feed and a watch page. 24 components, every
 selector counted against the live page on the route that declares it.
 
 ## Why this is `auth: personal-account`

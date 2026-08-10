@@ -5,10 +5,9 @@ components:
     selector: 'ytd-masthead#masthead'
     description: Top bar — search, guide toggle, and account controls.
     memory:
-      - Two masthead variants exist. The one seen through most of this mapping
-        carries a Back button and no `#avatar-btn` at all, on both routes and at
-        a 1768px viewport; a variant with `#avatar-btn` appeared once. Test for
-        the Back button rather than assuming account controls are present.
+      - Two masthead variants exist — one with `#avatar-btn` and account
+        controls, one with a Back button and no avatar at all. Test for the
+        Back button rather than assuming account controls are present.
       - No account control is declared here for that reason. A selector for the
         avatar matches nothing in the state this entry was verified against.
     children:
@@ -44,9 +43,9 @@ components:
     selector: 'ytd-page-manager#page-manager'
     description: Holds whichever page renderer the current route uses.
     memory:
-      - Ids are not unique on this site. `#content` matched 46 elements on the
-        home route and 12 on a watch route, so `getElementById` returns an
-        arbitrary one. Select by element name instead.
+      - Ids are not unique on this site — `#content` matches dozens of
+        elements per route, so `getElementById` returns an arbitrary one.
+        Select by element name instead.
       - The icon sprite defines invisible symbols with generic ids such as `add`
         and `alarm`, so a query like `#add` resolves to an icon definition
         rather than a control.

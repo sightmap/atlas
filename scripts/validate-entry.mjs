@@ -7,14 +7,16 @@
 // run reports every distinct problem):
 //
 //   front-matter        README.md exists and its front matter parses as YAML
+//   layout              the entry dir holds only what docs/SPEC.md names:
+//                       README.md, .sightmap/, screenshots/
 //   schema              front matter validates against schema/entry.schema.json
 //   slug-matches-folder front-matter slug == entry folder name
 //   slug-unique         slug collides with no other entries/<slug> and no
 //                       removed.yaml tombstone (removed slugs are never reused)
 //   spec-version        front-matter spec_version == .sightmap/config.yaml version
-//   screenshots         1-5 files named NN-<kebab>.png|.webp starting at 01,
-//                       each <=300 KB and 1200-2000 px wide, decodable as
-//                       PNG/WebP matching its extension
+//   screenshots         1-5 files named NN-<kebab>.png|.webp|.jpg|.jpeg
+//                       starting at 01, each <=300 KB and 1200-2000 px wide,
+//                       decodable as the format its extension claims
 //   corpus-pure         no `source:` / `dependencies:` keys anywhere in the
 //                       corpus — atlas maps are observed, not source-derived
 //   sightmap-validate   `sightmap validate` exits 0
@@ -63,6 +65,23 @@ function check(name, ok, detail = "") {
 const fmResult = parseFrontMatter(join(entryDir, "README.md"));
 const fm = fmResult.data ?? null;
 check("front-matter", !fmResult.error, fmResult.error ?? "README.md front matter parsed");
+
+// ── layout ───────────────────────────────────────────────────────────────────
+// docs/SPEC.md's directory layout is closed: anything else in the entry dir is
+// something `sightmap atlas add` will never install and a reviewer should not
+// have to read (the seed batch shipped seven stray mapping reports this way).
+
+{
+  const allowed = new Set(["README.md", ".sightmap", "screenshots"]);
+  const strays = readdirSync(entryDir).filter((name) => !allowed.has(name));
+  check(
+    "layout",
+    strays.length === 0,
+    strays.length === 0
+      ? "entry holds only README.md, .sightmap/, screenshots/"
+      : `unexpected file(s) in the entry dir: ${strays.join(", ")} — docs/SPEC.md names only README.md, .sightmap/, screenshots/`,
+  );
+}
 
 // ── schema ───────────────────────────────────────────────────────────────────
 
@@ -161,7 +180,11 @@ if (fm) {
 // ── screenshots ──────────────────────────────────────────────────────────────
 
 const MAX_SCREENSHOT_BYTES = 300 * 1024;
-const SCREENSHOT_NAME = /^(\d{2})-[a-z0-9][a-z0-9-]*\.(png|webp)$/;
+const SCREENSHOT_NAME = /^(\d{2})-[a-z0-9][a-z0-9-]*\.(png|webp|jpg|jpeg)$/;
+
+// `image-size` reports JPEG as "jpg" whichever extension the file carries, so
+// both spellings have to fold together before the decoded type is compared.
+const DECODED_TYPE = { jpeg: "jpg" };
 
 {
   const problems = [];
@@ -184,7 +207,7 @@ const SCREENSHOT_NAME = /^(\d{2})-[a-z0-9][a-z0-9-]*\.(png|webp)$/;
     for (const f of files.sort()) {
       const m = SCREENSHOT_NAME.exec(f);
       if (!m) {
-        problems.push(`${f}: name must match NN-<kebab-name>.png|.webp`);
+        problems.push(`${f}: name must match NN-<kebab-name>.png|.webp|.jpg|.jpeg`);
         continue;
       }
       numbers.push(Number(m[1]));
@@ -200,7 +223,8 @@ const SCREENSHOT_NAME = /^(\d{2})-[a-z0-9][a-z0-9-]*\.(png|webp)$/;
         problems.push(`${f}: cannot decode image: ${err.message}`);
         continue;
       }
-      if (dim.type !== m[2]) {
+      const expected = DECODED_TYPE[m[2]] ?? m[2];
+      if (dim.type !== expected) {
         problems.push(`${f}: extension .${m[2]} but decoded type is ${dim.type}`);
       }
       if (dim.width < 1200 || dim.width > 2000) {
