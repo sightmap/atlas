@@ -1,9 +1,14 @@
 version: 1
 
 memory:
-  - Every backend call goes through `/resource/:ResourceName/:verb/`, where
-    verb is get, create or update and the arguments ride in a `data=` query
-    parameter holding URL-encoded JSON. There is no REST path to read.
+  - Backend calls take the shape `/resource/:ResourceName/:verb/`, verb being
+    get, create or update, with arguments in a `data=` query parameter holding
+    URL-encoded JSON. Telemetry and traces under `/_/_/` are the exception.
+  - There is a REST path, one level down. `/resource/ApiResource/get/` proxies
+    the v3 API, and the real path and field list ride inside `data=` as
+    `options.url` and `options.data.fields`.
+  - Every `/resource/` call carries `source_url=<path>`, so the route that
+    issued a request is readable from its query string.
 
 requests:
   - name: ApiProxy
@@ -50,13 +55,6 @@ components:
   - name: SiteHeader
     selector: '[data-test-id="header"]'
     description: Fixed top bar — search, account avatar and the account menu.
-    memory:
-      - Backend calls take the shape `/resource/:ResourceName/:verb/`, verb being
-        get, create or update, with arguments in a `data=` query parameter
-        holding URL-encoded JSON. Telemetry and traces under `/_/_/` are the
-        exception.
-      - Every `/resource/` call carries `source_url=<path>`, so the route that
-        issued a request is readable from its query string.
     children:
       - name: SearchBox
         selector: '[data-test-id="search-box-input"]'

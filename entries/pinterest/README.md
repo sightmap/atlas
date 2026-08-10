@@ -2,12 +2,12 @@
 name: Pinterest
 slug: pinterest
 site_url: https://www.pinterest.com/
-domains: [pinterest.com, www.pinterest.com]
+domains: [pinterest.com]
 description: Pinterest mapped signed in — home feed, search, board, pin detail, profile and what a dead path renders instead of a 404.
 categories: [social]
 author: chiplay
 created: 2026-08-08
-updated: 2026-08-08
+updated: 2026-08-10
 last_verified: 2026-08-08
 cli_version: 0.19.0
 spec_version: 1
@@ -30,8 +30,10 @@ that the containers exist and what shape they have, never what is in them.
 Only the author can re-verify this entry. `last_verified` means the author
 re-checked with their own account; CI cannot, and neither can a reviewer.
 
-There are no screenshots: a Pinterest feed is other people's photographs end to
-end.
+Three screenshots ship — home, pin detail, search — captured signed in. They
+show the account's own board names and avatar, which the author is fine
+publishing, and public pins by their creators. No other person's name, face or
+contact details appears in a frame, and none of them was retouched.
 
 ## What bites
 
