@@ -7,7 +7,7 @@ description: YouTube mapped signed in — home, watch, search, channel, playlist
 categories: [media]
 author: chiplay
 created: 2026-08-08
-updated: 2026-08-08
+updated: 2026-08-10
 last_verified: 2026-08-08
 cli_version: 0.19.0
 spec_version: 1
@@ -31,8 +31,10 @@ memory note says what is inside belongs to the account.
 Only the author can re-verify this entry. `last_verified` means the author
 re-checked with their own account; CI cannot, and neither can a reviewer.
 
-There are no screenshots. Every frame of a signed-in session carries the
-account's feed, and the rule is to drop the frame rather than retouch it.
+Three screenshots ship — home, watch, channel — captured signed in. They show
+the account's recommended feed, which is the point of a signed-in map, plus
+published videos and their creators' own channel names and thumbnails. None of
+them was retouched.
 
 ## What bites
 
