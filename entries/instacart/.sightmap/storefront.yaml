@@ -7,8 +7,7 @@ views:
     description: One retailer's storefront — aisle rail, category tiles, and rows of item cards.
     memory:
       - Rows below the first mount as skeletons and never resolve while the tab
-        is in the background. Forty-five placeholders stood against six real
-        items after scrolling, and the placeholder count rose rather than fell.
+        is in the background — scrolling adds placeholders rather than items.
         Bring the tab to the foreground before trusting any count from this
         route.
       - Injected scrolling does not trigger the lazy load. `window.scrollTo`

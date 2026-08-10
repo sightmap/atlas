@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-08T20:01:23Z",
+  "generated_at": "2026-08-08T22:28:04Z",
   "entries": [
     {
       "slug": "airbnb",
@@ -72,7 +72,7 @@
         ".sightmap/search.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "4f6cdc87344f051c66934ea5cc6fb8b3312f735a"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "amazon",
@@ -98,7 +98,7 @@
         "components": 47,
         "requests": 12,
         "properties": 23,
-        "memory": 34
+        "memory": 33
       },
       "per_view": [
         {
@@ -145,7 +145,7 @@
         ".sightmap/search.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "39e64a534f8718945a96ebec76b2ec03ffc5e7af"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "apple",
@@ -218,7 +218,7 @@
         ".sightmap/search.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "33c8da740bd094583ccfb708b68609eb48e3a0af"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "ebay",
@@ -392,7 +392,7 @@
         ".sightmap/repo.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "32cbdb3183c258b703198943630f382567515a86"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "ikea",
@@ -418,7 +418,7 @@
         "components": 59,
         "requests": 11,
         "properties": 17,
-        "memory": 64
+        "memory": 61
       },
       "per_view": [
         {
@@ -465,15 +465,14 @@
         ".sightmap/search.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "037365d2b91cdd707161ae77c61c68e70e3bb4de"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "instacart",
       "name": "Instacart",
       "site_url": "https://www.instacart.com/",
       "domains": [
-        "instacart.com",
-        "www.instacart.com"
+        "instacart.com"
       ],
       "description": "Instacart's retailer storefront, mapped signed in — aisle rail, item cards, cart entry, and the skeletons that never resolve.",
       "categories": [
@@ -508,7 +507,7 @@
         ".sightmap/shared.yaml",
         ".sightmap/storefront.yaml"
       ],
-      "commit": "21d4ae87003f24100d3395703d970851503542aa"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "nike",
@@ -533,14 +532,14 @@
         "views": 5,
         "components": 42,
         "requests": 17,
-        "properties": 16,
-        "memory": 40
+        "properties": 14,
+        "memory": 41
       },
       "per_view": [
         {
           "name": "CategoryWall",
           "route": "/w/:categorySlug",
-          "components": 11,
+          "components": 12,
           "requests": 2
         },
         {
@@ -581,15 +580,14 @@
         ".sightmap/shared.yaml",
         ".sightmap/wall.yaml"
       ],
-      "commit": "86d4aff271edde12fd4d844e0b160ac17ac9da20"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "pinterest",
       "name": "Pinterest",
       "site_url": "https://www.pinterest.com/",
       "domains": [
-        "pinterest.com",
-        "www.pinterest.com"
+        "pinterest.com"
       ],
       "description": "Pinterest's pin detail page, mapped signed in — closeup image, description, action bar, and the related-pin grid.",
       "categories": [
@@ -624,7 +622,7 @@
         ".sightmap/pin.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "84409442e496621ce0aac1b2e51b16cbb48355bb"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "spotify",
@@ -666,7 +664,7 @@
         ".sightmap/config.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "8ac783260b8eff713e77560778daaea465e56cf1"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "uniqlo",
@@ -739,7 +737,7 @@
         ".sightmap/search.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "ef9f2193fa1c481a1cd435b95f5ac480743b8419"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "vuori",
@@ -812,7 +810,7 @@
         ".sightmap/search.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "bcde844d9abf76cb7f8e03117abe765ded9a20fb"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "youtube",
@@ -862,7 +860,7 @@
         ".sightmap/shared.yaml",
         ".sightmap/watch.yaml"
       ],
-      "commit": "8110c7dc52282952b438022c3522fb049afb7605"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     },
     {
       "slug": "zillow",
@@ -905,7 +903,7 @@
         ".sightmap/home.yaml",
         ".sightmap/shared.yaml"
       ],
-      "commit": "df600fb1c5b473c159c47686c097f7738b59d1d8"
+      "commit": "18315720bf349f7a7a3f1b5fe4082469fcffebc6"
     }
   ]
 }
