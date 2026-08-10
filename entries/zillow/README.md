@@ -71,5 +71,7 @@ treated as such.
 wrong on the first pass and caught before commit — the card anchor, scoped as a
 child of the card it belongs to, matched nothing.
 
-No requests are recorded. `sightmap sel-probe` cannot attach to the browser this
-was authored in, so matches were counted in-page instead.
+No requests are recorded — the requests dimension is a known gap of this entry,
+not a claim that the page makes no calls. (`sightmap sel-probe` cannot attach to
+the browser this was authored in, so selector matches were counted in-page
+instead.)

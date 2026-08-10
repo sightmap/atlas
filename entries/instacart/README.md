@@ -2,7 +2,7 @@
 name: Instacart
 slug: instacart
 site_url: https://www.instacart.com/
-domains: [instacart.com, www.instacart.com]
+domains: [instacart.com]
 description: Instacart's retailer storefront, mapped signed in — aisle rail, item cards, cart entry, and the skeletons that never resolve.
 categories: [commerce]
 author: chiplay

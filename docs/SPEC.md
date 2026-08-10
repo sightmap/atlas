@@ -55,7 +55,7 @@ Body below the front matter is free-form: coverage notes, quirks, known gaps. No
 
 ## Corpus rules (enforced)
 
-- `sightmap validate` passes; `sightmap lint` passes (warnings allowed only with a justifying note in the README body).
+- `sightmap validate` passes; `sightmap lint` exits clean — CI requires a zero exit. Where a lint rule misfires on a stable selector, rewrite the selector to an equivalent form the rule accepts and justify the workaround in the README body.
 - `config.yaml` pins `version` and matches front-matter `spec_version`.
 - No `source:` / `dependencies:` keys — atlas maps are observed, not source-derived.
 - Selectors verified against the live site at authoring time (`sightmap sel-probe`); record the date in `last_verified`.
@@ -92,8 +92,9 @@ for detail it cannot use.
 
 ## Screenshot rules (enforced)
 
-- `screenshots/NN-<kebab-name>.png`, NN starting at `01`; 1–5 images per entry.
-- ≤300 KB each, width 1200–2000 px, PNG or WebP.
+- `screenshots/NN-<kebab-name>.<ext>`, NN starting at `01`; 1–5 images per entry.
+- ≤300 KB each, width 1200–2000 px, PNG, WebP or JPEG (`.png`, `.webp`, `.jpg`, `.jpeg`).
+- The file must decode as the format its extension claims.
 - Public, non-sensitive screens only; no personal data, no real customer records (see POLICY.md). Demo/sandbox data must look like demo data.
 
 ## Signed-in entries (`auth: personal-account`)
@@ -160,9 +161,9 @@ Built on every merge to `main` by CI; consumed by sightmap.org/atlas and by `sig
 ```
 
 Contracts that must not drift:
-- `files[]` lists every corpus file relative to the entry dir, `.sightmap/`-prefixed — `sightmap add` fetches exactly these.
+- `files[]` lists every corpus file relative to the entry dir, `.sightmap/`-prefixed. (`sightmap atlas add` installs the entry's published `<slug>.tar.gz`, built from the same tree — `files[]` is the readable manifest of what that archive holds.)
 - `stats` / `per_view` come from `sightmap stats --json`, never hand-computed.
-- `commit` lets consumers fetch immutably.
+- `commit` records the last commit that touched the entry, for provenance.
 
 ## removed.yaml
 
