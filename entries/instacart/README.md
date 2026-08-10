@@ -51,6 +51,5 @@ Sign in and pick a retailer first; nothing renders without a delivery address.
 - **The cart is a drawer, not a route.** It sits in the DOM whether open or
   not, one of eight `[role="dialog"]` elements.
 
-No screenshots — the header carries the account's street address in every frame.
-Only the author can re-verify this entry — CI cannot, and neither can a
-reviewer.
+Two screenshots, captured signed in with the delivery address replaced. Only the
+author can re-verify this entry — CI cannot, and neither can a reviewer.
