@@ -4,15 +4,18 @@
 #   1. rebuild index.json with scripts/gen-index.mjs (stats come from the
 #      pinned sightmap CLI — NEVER hand-computed, never --allow-missing-stats
 #      here: the published index must always carry full stats),
-#   2. if index.json changed, commit it back to main with [skip ci]
-#      (GitHub natively skips workflows for that trailer, so this cannot
-#      retrigger itself; the `publish` concurrency group serializes runs
-#      from rapid merges),
-#   3. vendor index.json + every entry's screenshots, corpus and README into
+#   2. vendor index.json + every entry's screenshots, corpus and README into
 #      sightmap/sightmap as
 #      ONE rolling PR (branch atlas-vendoring, force-pushed). sightmap.org's
 #      build stays fully local — atlas data reaches it only via this PR,
 #      never a network fetch at build time. The PR is NEVER auto-merged.
+#
+# index.json is built here and vendored; it is NOT committed back to this
+# repo. It is a generated artifact and nothing in the repo reads it — the CLI
+# reads the published copy at https://sightmap.org/atlas/index.json, and step 2
+# copies the file this run just generated. The workflow used to commit it to
+# main, which stopped working once a ruleset required changes to go through a
+# pull request, and took the vendoring step down with it.
 #
 # The vendoring step is guarded on the ATLAS_BOT_TOKEN secret (fine-grained
 # PAT with contents+PR write on sightmap/sightmap — see plan/IMPLEMENTATION.md
@@ -26,7 +29,7 @@ on:
     branches: [main]
 
 permissions:
-  contents: write # push the regenerated index.json back to main
+  contents: read # checkout only; the vendoring PR uses ATLAS_BOT_TOKEN
 
 concurrency:
   group: publish
@@ -84,35 +87,6 @@ jobs:
 
       - name: Regenerate index.json
         run: node scripts/gen-index.mjs
-
-      - name: Commit index.json to main if changed
-        run: |
-          set -euo pipefail
-          git add index.json
-          if git diff --cached --quiet; then
-            echo "index.json is unchanged; nothing to commit"
-            exit 0
-          fi
-          # gen-index stamps generated_at on every run; a diff consisting of
-          # nothing but that timestamp is not a real change — don't spam main
-          # with a bot commit per docs-only merge.
-          meaningful="$(git diff --cached -U0 -- index.json \
-            | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' \
-            | grep -v '"generated_at":' || true)"
-          if [ -z "${meaningful}" ]; then
-            echo "index.json differs only in generated_at; skipping commit"
-            git reset -q -- index.json
-            git checkout -q -- index.json
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898062+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Regenerate index.json [skip ci]"
-          # A merge may have landed while this run was queued; rebase so the
-          # push is fast-forward. (Its own publish run is queued behind this
-          # one in the `publish` concurrency group and will regenerate.)
-          git pull --rebase origin main
-          git push origin HEAD:main
 
       - name: Vendor atlas data into sightmap/sightmap (rolling PR)
         env:

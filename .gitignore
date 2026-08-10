@@ -1,1 +1,5 @@
 node_modules/
+
+# Generated on every publish run and vendored into sightmap/sightmap.
+# Never committed here — see .github/workflows/publish.yml.
+index.json
