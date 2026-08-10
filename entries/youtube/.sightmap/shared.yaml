@@ -1,5 +1,31 @@
 version: 1
 
+requests:
+  - name: Guide
+    route: /youtubei/v1/guide
+    method: POST
+    description: The left navigation, including the account's subscriptions. Fires once per full page load on every route.
+
+  - name: Player
+    route: /youtubei/v1/player
+    method: POST
+    description: Playback configuration for a video. It fires on search and browse routes too, because thumbnails preview on hover.
+
+  - name: LogEvent
+    route: /youtubei/v1/log_event
+    method: POST
+    description: Client telemetry, fired repeatedly on every route.
+
+  - name: PlaybackStats
+    route: /api/stats/qoe
+    method: GET
+    description: Playback quality telemetry.
+
+  - name: TimedText
+    route: /api/timedtext
+    method: GET
+    description: Caption tracks for whatever is playing.
+
 components:
   - name: Masthead
     selector: 'ytd-masthead#masthead'
